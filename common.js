@@ -18,6 +18,35 @@
 
   AL.safeName = s => String(s || 'file').replace(/[^\w\u0600-\u06FF-]+/g, '_').slice(0, 40);
 
+  // ---------- شبکه‌های اجتماعی ----------
+  AL.normInstagram = s => {
+    let v = String(s || '').trim().replace(/^https?:\/\/(www\.)?instagram\.com\//i, '').replace(/^instagram\.com\//i, '');
+    v = v.split(/[/?#]/)[0].replace(/^@+/, '');
+    return /^[A-Za-z0-9._]{1,30}$/.test(v) ? v : '';
+  };
+  AL.normTelegram = s => {
+    let v = String(s || '').trim().replace(/^https?:\/\/(www\.)?(t\.me|telegram\.me)\//i, '').replace(/^(t\.me|telegram\.me)\//i, '');
+    v = v.split(/[/?#]/)[0].replace(/^@+/, '');
+    return /^[A-Za-z0-9_]{4,32}$/.test(v) ? v : '';
+  };
+  // شماره واتساپ → قالب بین‌المللی بدون + (۰۹۱۵۱۲۳۴۵۶۷ → 989151234567). فرض: شماره بدون پیش‌شماره، ایرانی است.
+  AL.normWhatsapp = s => {
+    let v = AL.normDigits(s);
+    const plus = v.startsWith('+');
+    v = v.replace(/\+/g, '');
+    if (v.startsWith('00')) v = v.slice(2);
+    else if (!plus && v.startsWith('0')) v = '98' + v.slice(1);
+    else if (!plus && v.length === 10 && v.startsWith('9')) v = '98' + v;
+    return /^\d{8,15}$/.test(v) ? v : '';
+  };
+  AL.socialLinks = d => {
+    const out = [];
+    if (d && d.instagram) out.push({ key: 'instagram', label: 'Instagram', value: '@' + d.instagram, url: 'https://instagram.com/' + encodeURIComponent(d.instagram) });
+    if (d && d.whatsapp) out.push({ key: 'whatsapp', label: 'WhatsApp', value: '+' + d.whatsapp, url: 'https://wa.me/' + encodeURIComponent(d.whatsapp) });
+    if (d && d.telegram) out.push({ key: 'telegram', label: 'Telegram', value: '@' + d.telegram, url: 'https://t.me/' + encodeURIComponent(d.telegram) });
+    return out;
+  };
+
   AL.hasCoords = d => d && typeof d.lat === 'number' && typeof d.lng === 'number';
 
   AL.googleLink = (lat, lng) => `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
@@ -37,6 +66,7 @@
       v += 'GEO:' + d.lat + ';' + d.lng + '\r\n';
       v += 'URL:' + AL.googleLink(d.lat, d.lng) + '\r\n';
     }
+    AL.socialLinks(d).forEach(s => { v += 'URL;TYPE=' + s.label + ':' + s.url + '\r\n'; });
     if (d.category) v += 'CATEGORIES:' + AL.vEsc(d.category) + '\r\n';
     v += 'END:VCARD';
     return v;
@@ -128,7 +158,7 @@
   };
 
   AL.toCsv = function (list) {
-    let csv = '\uFEFFردیف,نام,شماره تماس,نوع,سرفصل (دسته‌بندی),عنوان شغلی,توضیحات,آدرس,عرض جغرافیایی,طول جغرافیایی,تاریخ\n';
+    let csv = '\uFEFFردیف,نام,شماره تماس,نوع,سرفصل (دسته‌بندی),عنوان شغلی,توضیحات,آدرس,اینستاگرام,واتساپ,تلگرام,عرض جغرافیایی,طول جغرافیایی,تاریخ\n';
     list.forEach((d, i) => {
       const plist = (Array.isArray(d.phones) ? d.phones : (d.phone ? [d.phone] : [])).map(p => String(p).replace(/"/g, ''));
       const phones = plist.length ? '="' + plist.join(' - ') + '"' : '';
@@ -136,7 +166,7 @@
       const when = d.createdAt || d.savedAt;
       const date = when ? new Date(when).toLocaleDateString('fa-IR') : '-';
       csv += [i + 1, csvCell(d.name), '"' + phones.replace(/"/g, '""') + '"', csvCell(type), csvCell(d.category),
-        csvCell(d.title), csvCell(d.description), csvCell(d.address), csvCell(d.lat), csvCell(d.lng), csvCell(date)].join(',') + '\n';
+        csvCell(d.title), csvCell(d.description), csvCell(d.address), csvCell(d.instagram), (d.whatsapp ? '"=""' + d.whatsapp + '"""' : '""'), csvCell(d.telegram), csvCell(d.lat), csvCell(d.lng), csvCell(date)].join(',') + '\n';
     });
     return csv;
   };

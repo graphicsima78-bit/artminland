@@ -36,7 +36,7 @@ artminland/
 ## ساختار داده (collection: customers)
 
 name, phones[], title, description, address, category, type (business/personal),
-registerGoogle, registerNeshan, hasPhoto, lat, lng (اختیاری، از GPS), createdAt (ISO)
+registerGoogle, registerNeshan, hasPhoto, lat, lng (اختیاری، از GPS), instagram, whatsapp, telegram (اختیاری)، createdAt (ISO)
 
 ## ذخیره‌سازی
 
