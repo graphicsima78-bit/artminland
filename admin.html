@@ -7,10 +7,9 @@
 <meta name="theme-color" content="#2e7d32">
 <title>پنل مدیریت - آرتمین لند</title>
 <link rel="icon" type="image/png" href="icon-192.png">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
 <style>
 * { box-sizing: border-box; }
-body { font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, Tahoma, Arial, sans-serif; background: #f0f2f5; padding: 16px; margin: 0; }
+body { font-family: Tahoma, Arial, sans-serif; background: #f0f2f5; padding: 16px; margin: 0; }
 .container { max-width: 1150px; margin: 0 auto; background: white; padding: 24px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 h1 { color: #1b5e20; text-align: center; margin: 0 0 20px; font-size: 22px; }
 .btn { background: #2e7d32; color: white; border: none; padding: 10px 16px; border-radius: 8px; font-size: 14px; cursor: pointer; font-family: inherit; text-decoration: none; display: inline-block; }
@@ -40,7 +39,7 @@ td.actions button { margin: 2px; }
 .count { text-align: center; color: #666; font-size: 13px; margin-bottom: 8px; }
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; padding: 16px; }
 .modal-overlay.active { display: flex; }
-.modal { background: white; border-radius: 16px; padding: 22px; max-width: 520px; width: 100%; max-height: 92vh; overflow-y: auto; }
+.modal { background: white; border-radius: 16px; padding: 22px; max-width: 480px; width: 100%; max-height: 92vh; overflow-y: auto; }
 .modal h3 { color: #1b5e20; margin: 0 0 12px; text-align: center; }
 .modal label { display: block; font-size: 13px; font-weight: bold; margin: 10px 0 4px; color: #333; }
 .modal input, .modal select, .modal textarea { width: 100%; }
@@ -48,7 +47,7 @@ td.actions button { margin: 2px; }
 .modal .row .btn { flex: 1; }
 .qr-img { display: block; margin: 10px auto; width: 100%; max-width: 280px; border: 8px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.15); border-radius: 10px; image-rendering: pixelated; }
 </style>
-<script src="qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script src="common.js"></script>
 </head>
 <body>
@@ -81,7 +80,7 @@ td.actions button { margin: 2px; }
         <thead>
           <tr>
             <th>ردیف</th><th>نام</th><th>شماره تماس</th><th>نوع</th><th>سرفصل</th>
-            <th>عنوان شغلی</th><th>توضیحات</th><th>آدرس</th><th>شبکه‌ها و راه‌های ارتباطی</th><th>تاریخ ثبت</th><th>عملیات</th>
+            <th>عنوان شغلی</th><th>توضیحات</th><th>آدرس</th><th>شبکه‌ها و ایمیل</th><th>تاریخ ثبت</th><th>عملیات</th>
           </tr>
         </thead>
         <tbody id="tableBody"></tbody>
@@ -118,15 +117,11 @@ td.actions button { margin: 2px; }
     </select>
     <label>عنوان شغلی</label><input type="text" id="eTitle" maxlength="120">
     <label>توضیحات</label><textarea id="eDesc" rows="2" maxlength="500"></textarea>
-    <label>ایمیل</label><input type="email" id="eEmail" maxlength="100" dir="ltr">
-    <label>وب‌سایت</label><input type="url" id="eWebsite" maxlength="200" dir="ltr">
     <label>آدرس</label><textarea id="eAddress" rows="2" maxlength="500"></textarea>
     <label>اینستاگرام (نام کاربری یا لینک)</label><input type="text" id="eInstagram" maxlength="100" dir="ltr">
-    <label>واتساپ (شماره)</label><input type="tel" id="eWhatsapp" maxlength="30" dir="ltr">
+    <label>واتساپ (شماره)</label><input type="text" id="eWhatsapp" maxlength="30" dir="ltr">
     <label>تلگرام (نام کاربری یا لینک)</label><input type="text" id="eTelegram" maxlength="100" dir="ltr">
-    <label>ایتا (نام کاربری یا لینک)</label><input type="text" id="eEitaa" maxlength="100" dir="ltr">
-    <label>بله (نام کاربری یا لینک)</label><input type="text" id="eBale" maxlength="100" dir="ltr">
-    <label>روبیکا (نام کاربری یا لینک)</label><input type="text" id="eRubika" maxlength="100" dir="ltr">
+    <label>ایمیل</label><input type="email" id="eEmail" maxlength="100" dir="ltr">
     <div id="editError" class="msg err" style="padding:8px;"></div>
     <div class="row">
       <button class="btn" id="eSave">💾 ذخیره</button>
@@ -197,7 +192,7 @@ td.actions button { margin: 2px; }
     return allData.filter(d => {
       if (catFilter !== '__all__' && (d.category || '') !== catFilter) return false;
       if (!q) return true;
-      return [d.name, phonesOf(d).join(' '), d.category, d.title, d.description, d.address, d.email, d.website, d.instagram, d.telegram, d.eitaa, d.bale, d.rubika].join(' ').toLowerCase().includes(q);
+      return [d.name, phonesOf(d).join(' '), d.category, d.title, d.description, d.address].join(' ').toLowerCase().includes(q);
     });
   }
 
@@ -251,14 +246,16 @@ td.actions button { margin: 2px; }
       allData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       render();
     } catch (e) {
+      console.error(e);
       $('status').className = 'msg err';
-      $('status').textContent = 'خطا در بارگذاری: ' + e.message;
+      $('status').textContent = '❌ خطا در دریافت اطلاعات: ' + e.message;
     }
   }
 
+  // ---------- QR ----------
   function showQr(d) {
-    $('qrName').textContent = d.name;
     const url = AL.qrDataUrl(AL.buildVCard(d), 512);
+    $('qrName').textContent = d.name || '';
     $('qrImg').src = url;
     $('qrDownload').onclick = () => {
       if (url.startsWith('data:')) AL.downloadDataUrl(url, 'QR-' + AL.safeName(d.name) + '.png');
@@ -269,11 +266,12 @@ td.actions button { margin: 2px; }
   $('qrClose').addEventListener('click', () => $('qrModal').classList.remove('active'));
   $('qrModal').addEventListener('click', e => { if (e.target === $('qrModal')) $('qrModal').classList.remove('active'); });
 
+  // ---------- ویرایش ----------
   function openEdit(d) {
     editing = d;
     $('eName').value = d.name || '';
-    $('eType').value = d.type || 'business';
-    $('ePhones').value = phonesOf(d).join('\n');
+    $('eType').value = d.type === 'personal' ? 'personal' : 'business';
+    $('ePhones').value = phonesOf(d).join(', ');
     const sel = $('eCategory');
     if (d.category && ![...sel.options].some(o => o.value === d.category || o.textContent === d.category)) {
       const o = document.createElement('option'); o.textContent = d.category; sel.appendChild(o);
@@ -281,15 +279,11 @@ td.actions button { margin: 2px; }
     sel.value = d.category || '';
     $('eTitle').value = d.title || '';
     $('eDesc').value = d.description || '';
-    $('eEmail').value = d.email || '';
-    $('eWebsite').value = d.website || '';
     $('eAddress').value = d.address || '';
     $('eInstagram').value = d.instagram || '';
     $('eWhatsapp').value = d.whatsapp || '';
     $('eTelegram').value = d.telegram || '';
-    $('eEitaa').value = d.eitaa || '';
-    $('eBale').value = d.bale || '';
-    $('eRubika').value = d.rubika || '';
+    $('eEmail').value = d.email || '';
     $('editError').textContent = '';
     $('editModal').classList.add('active');
   }
@@ -298,16 +292,9 @@ td.actions button { margin: 2px; }
     const name = $('eName').value.trim();
     const phones = $('ePhones').value.split(/[,،\n]+/).map(AL.normDigits).filter(Boolean);
     if (!name || !phones.length) { $('editError').textContent = 'نام و حداقل یک شماره لازم است.'; return; }
-
-    const email = AL.normEmail($('eEmail').value.trim());
-    const website = AL.normUrl($('eWebsite').value.trim());
-    const instagram = AL.normInstagram($('eInstagram').value.trim());
-    const whatsapp = AL.normWhatsapp($('eWhatsapp').value.trim());
-    const telegram = AL.normTelegram($('eTelegram').value.trim());
-    const eitaa = AL.normEitaa($('eEitaa').value.trim());
-    const bale = AL.normBale($('eBale').value.trim());
-    const rubika = AL.normRubika($('eRubika').value.trim());
-
+    const igRaw = $('eInstagram').value.trim(), waRaw = $('eWhatsapp').value.trim(), tgRaw = $('eTelegram').value.trim(), emRaw = $('eEmail').value.trim();
+    const instagram = AL.normInstagram(igRaw), whatsapp = AL.normWhatsapp(waRaw), telegram = AL.normTelegram(tgRaw), email = AL.normEmail(emRaw);
+    if ((igRaw && !instagram) || (waRaw && !whatsapp) || (tgRaw && !telegram) || (emRaw && !email)) { $('editError').textContent = 'اینستاگرام، واتساپ، تلگرام یا ایمیل معتبر نیست.'; return; }
     const patch = {
       name, phones,
       type: $('eType').value,
@@ -315,7 +302,7 @@ td.actions button { margin: 2px; }
       title: $('eTitle').value.trim(),
       description: $('eDesc').value.trim(),
       address: $('eAddress').value.trim(),
-      email, website, instagram, whatsapp, telegram, eitaa, bale, rubika
+      instagram, whatsapp, telegram, email
     };
     try {
       await updateDoc(doc(db, 'customers', editing.id), patch);
@@ -336,46 +323,34 @@ td.actions button { margin: 2px; }
     } catch (e) { alert('حذف ناموفق بود: ' + e.message); }
   }
 
-  // ---------- خروجی ----------
+  // ---------- خروجی (بر اساس فیلتر و جستجوی فعلی) ----------
   function exportList(kind) {
     const list = filtered();
-    if (!list.length) { alert('موردی برای خروجی وجود ندارد.'); return; }
+    if (!list.length) { alert('هیچ داده‌ای برای دانلود وجود ندارد!'); return; }
     const stamp = Date.now();
-    if (kind === 'csv') AL.downloadText(`customers-${stamp}.csv`, AL.toCsv(list), 'text/csv;charset=utf-8');
-    else if (kind === 'vcf') AL.downloadText(`customers-${stamp}.vcf`, AL.vcardsFile(list), 'text/vcard;charset=utf-8');
-    else AL.downloadText(`customers-${stamp}.json`, JSON.stringify({ exportedAt: new Date().toISOString(), total: list.length, customers: list }, null, 2), 'application/json');
+    if (kind === 'csv') AL.downloadText(`ArteminLand-${stamp}.csv`, AL.toCsv(list), 'text/csv;charset=utf-8');
+    else if (kind === 'vcf') AL.downloadText(`ArteminLand-contacts-${stamp}.vcf`, AL.vcardsFile(list), 'text/vcard;charset=utf-8');
+    else AL.downloadText(`ArteminLand-${stamp}.json`, JSON.stringify({ exportedAt: new Date().toISOString(), total: list.length, customers: list }, null, 2), 'application/json');
   }
-
   $('btnCsv').addEventListener('click', () => exportList('csv'));
   $('btnVcf').addEventListener('click', () => exportList('vcf'));
   $('btnJson').addEventListener('click', () => exportList('json'));
-  $('btnReload').addEventListener('click', loadData);
-  $('search').addEventListener('input', render);
 
-  // ---------- ورود / خروج ----------
+  $('search').addEventListener('input', render);
+  $('btnReload').addEventListener('click', loadData);
+  $('btnLogout').addEventListener('click', () => signOut(auth));
+
   $('login').addEventListener('submit', async e => {
     e.preventDefault();
     $('loginError').textContent = '';
-    const email = $('email').value.trim();
-    const password = $('password').value;
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-    } catch (err) {
-      $('loginError').textContent = 'ورود ناموفق: ایمیل یا رمز عبور اشتباه است.';
-    }
+    try { await signInWithEmailAndPassword(auth, $('email').value.trim(), $('password').value); }
+    catch (err) { $('loginError').textContent = 'ایمیل یا رمز عبور اشتباه است.'; }
   });
-  $('btnLogout').addEventListener('click', () => signOut(auth));
 
   onAuthStateChanged(auth, user => {
-    if (user) {
-      $('login').style.display = 'none';
-      $('panel').style.display = 'block';
-      loadData();
-    } else {
-      $('login').style.display = 'flex';
-      $('panel').style.display = 'none';
-      allData = [];
-    }
+    $('login').style.display = user ? 'none' : 'flex';
+    $('panel').style.display = user ? 'block' : 'none';
+    if (user) loadData();
   });
 </script>
 </body>

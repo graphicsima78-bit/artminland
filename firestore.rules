@@ -4,12 +4,11 @@ service cloud.firestore {
 
     match /customers/{customerId} {
 
-      // ثبت مشتری جدید (از طریق فرم عمومی سایت با فیلدهای مجاز)
+      // هر کسی می‌تواند مشتری جدید ثبت کند (فرم سایت)، ولی فقط با ساختار مجاز
       allow create: if request.resource.data.keys().hasOnly([
                          'name', 'phones', 'title', 'description', 'address', 'category',
                          'type', 'registerGoogle', 'registerNeshan', 'hasPhoto', 'createdAt',
-                         'lat', 'lng', 'email', 'website', 'instagram', 'whatsapp', 'telegram',
-                         'eitaa', 'bale', 'rubika'
+                         'lat', 'lng', 'instagram', 'whatsapp', 'telegram', 'email'
                        ])
                     && request.resource.data.keys().hasAll(['name', 'phones'])
                     && request.resource.data.name is string
@@ -24,17 +23,15 @@ service cloud.firestore {
                     && request.resource.data.get('type', 'business') in ['business', 'personal']
                     && request.resource.data.get('lat', 0) is number
                     && request.resource.data.get('lng', 0) is number
-                    && request.resource.data.get('email', '').size() <= 100
-                    && request.resource.data.get('website', '').size() <= 200
                     && request.resource.data.get('instagram', '').size() <= 64
                     && request.resource.data.get('whatsapp', '').size() <= 20
                     && request.resource.data.get('telegram', '').size() <= 64
-                    && request.resource.data.get('eitaa', '').size() <= 64
-                    && request.resource.data.get('bale', '').size() <= 64
-                    && request.resource.data.get('rubika', '').size() <= 64;
+                    && request.resource.data.get('email', '').size() <= 100;
 
-      // خواندن، ویرایش و حذف فقط برای کاربرانی که لاگین کرده‌اند (پنل ادمین)
-      allow read, update, delete: if request.auth != null;
+      // خواندن، ویرایش و حذف فقط برای ادمین
+      // YOUR_ADMIN_UID را با UID کاربر ادمین (از Authentication → Users) جایگزین کن
+      allow read, update, delete: if request.auth != null
+                                  && request.auth.uid == 'YOUR_ADMIN_UID';
     }
   }
 }
