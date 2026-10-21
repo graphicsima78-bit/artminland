@@ -11,12 +11,13 @@
 <style>
 * { box-sizing: border-box; }
 body { font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, Tahoma, Arial, sans-serif; background: #f0f2f5; padding: 16px; margin: 0; }
-.container { max-width: 1150px; margin: 0 auto; background: white; padding: 24px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.container { max-width: 1180px; margin: 0 auto; background: white; padding: 24px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 h1 { color: #1b5e20; text-align: center; margin: 0 0 20px; font-size: 22px; }
 .btn { background: #2e7d32; color: white; border: none; padding: 10px 16px; border-radius: 8px; font-size: 14px; cursor: pointer; font-family: inherit; text-decoration: none; display: inline-block; }
 .btn:hover { background: #1b5e20; }
 .btn-gray { background: #757575; } .btn-gray:hover { background: #616161; }
 .btn-blue { background: #1976d2; } .btn-blue:hover { background: #0d47a1; }
+.btn-orange { background: #ff9800; } .btn-orange:hover { background: #f57c00; }
 .btn-red { background: #d32f2f; } .btn-red:hover { background: #b71c1c; }
 .btn-sm { padding: 6px 10px; font-size: 13px; }
 .toolbar { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: center; margin-bottom: 14px; }
@@ -35,7 +36,7 @@ td.actions { white-space: nowrap; }
 td.actions button { margin: 2px; }
 .msg { text-align: center; color: #666; padding: 24px; }
 .err { color: #c62828; }
-#login { max-width: 360px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
+#login { max-width: 380px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
 #login input { width: 100%; }
 .count { text-align: center; color: #666; font-size: 13px; margin-bottom: 8px; }
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; padding: 16px; }
@@ -56,19 +57,21 @@ td.actions button { margin: 2px; }
   <h1>📊 پنل مدیریت مشتریان - آرتمین لند</h1>
 
   <form id="login" style="display:none;">
-    <input type="email" id="email" placeholder="ایمیل ادمین" autocomplete="username" dir="ltr" required>
+    <input type="email" id="email" placeholder="ایمیل ادمین (مثال: graphic.sima78@gmail.com)" autocomplete="username" dir="ltr" required>
     <input type="password" id="password" placeholder="رمز عبور" autocomplete="current-password" dir="ltr" required>
-    <button class="btn" type="submit">ورود</button>
+    <button class="btn" type="submit">ورود به پنل</button>
+    <button type="button" class="btn btn-orange btn-sm" id="btnForgot">🔑 بازیابی / فراموشی رمز عبور</button>
     <a class="btn btn-gray" href="index.html" style="text-align:center;">🔙 بازگشت به سایت</a>
-    <div id="loginError" class="msg err"></div>
+    <div id="loginError" class="msg err" style="padding:10px 0;"></div>
+    <div id="resetSuccess" class="msg" style="color:#2e7d32;display:none;font-weight:bold;padding:10px 0;"></div>
   </form>
 
   <div id="panel" style="display:none;">
     <div class="toolbar">
       <input type="search" id="search" placeholder="🔍 جستجو (نام، تلفن، آدرس...)" style="min-width:220px;">
-      <button class="btn btn-blue" id="btnCsv">📊 اکسل (CSV)</button>
-      <button class="btn btn-blue" id="btnVcf">👤 مخاطبین (.vcf)</button>
-      <button class="btn btn-blue" id="btnJson">💾 JSON</button>
+      <button class="btn btn-blue" id="btnCsv">📊 خروجی اکسل (CSV)</button>
+      <button class="btn btn-blue" id="btnVcf">👤 خروجی مخاطبین (.vcf)</button>
+      <button class="btn btn-blue" id="btnJson">💾 خروجی JSON</button>
       <button class="btn" id="btnReload">🔄 بارگذاری مجدد</button>
       <a class="btn btn-gray" href="index.html">🔙 سایت</a>
       <button class="btn btn-gray" id="btnLogout">خروج</button>
@@ -80,7 +83,7 @@ td.actions button { margin: 2px; }
       <table id="dataTable" style="display:none;">
         <thead>
           <tr>
-            <th>ردیف</th><th>نام</th><th>شماره تماس</th><th>نوع</th><th>سرفصل</th>
+            <th>ردیف</th><th>نام کسب‌وکار / شخص</th><th>مدیریت</th><th>شماره تماس</th><th>نوع</th><th>سرفصل</th>
             <th>عنوان شغلی</th><th>توضیحات</th><th>آدرس</th><th>شبکه‌ها و راه‌های ارتباطی</th><th>تاریخ ثبت</th><th>عملیات</th>
           </tr>
         </thead>
@@ -106,7 +109,8 @@ td.actions button { margin: 2px; }
 <div class="modal-overlay" id="editModal">
   <div class="modal">
     <h3>✏️ ویرایش مشتری</h3>
-    <label>نام</label><input type="text" id="eName" maxlength="120">
+    <label>نام کسب‌وکار یا شخص</label><input type="text" id="eName" maxlength="120">
+    <label>نام مدیریت (در صورت کسب‌وکار)</label><input type="text" id="eManager" maxlength="120">
     <label>نوع</label>
     <select id="eType"><option value="business">کسب‌وکار</option><option value="personal">شخصی</option></select>
     <label>شماره‌ها (با کاما یا خط جدید جدا کن)</label><textarea id="ePhones" rows="2" dir="ltr"></textarea>
@@ -138,7 +142,7 @@ td.actions button { margin: 2px; }
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
   import { getFirestore, collection, getDocs, deleteDoc, updateDoc, doc, orderBy, query } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+  import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBUNhCBLHR10Q5J7lrigRpL4CuPk-y6toY",
@@ -197,7 +201,7 @@ td.actions button { margin: 2px; }
     return allData.filter(d => {
       if (catFilter !== '__all__' && (d.category || '') !== catFilter) return false;
       if (!q) return true;
-      return [d.name, phonesOf(d).join(' '), d.category, d.title, d.description, d.address, d.email, d.website, d.instagram, d.telegram, d.eitaa, d.bale, d.rubika].join(' ').toLowerCase().includes(q);
+      return [d.name, d.manager, phonesOf(d).join(' '), d.category, d.title, d.description, d.address, d.email, d.website, d.instagram, d.telegram, d.eitaa, d.bale, d.rubika].filter(Boolean).join(' ').toLowerCase().includes(q);
     });
   }
 
@@ -224,7 +228,7 @@ td.actions button { margin: 2px; }
     tbody.innerHTML = '';
     rows.forEach((d, i) => {
       const tr = document.createElement('tr');
-      tr.append(cell(String(i + 1)), cell(d.name), cell(phonesOf(d).join(' - '), 'ltr'), cell(typeOf(d)),
+      tr.append(cell(String(i + 1)), cell(d.name), cell(d.manager || '-'), cell(phonesOf(d).join(' - '), 'ltr'), cell(typeOf(d)),
         cell(d.category), cell(d.title), cell(d.description), cell(d.address), socialCell(d), cell(dateOf(d)));
       const td = document.createElement('td');
       td.className = 'actions';
@@ -258,7 +262,7 @@ td.actions button { margin: 2px; }
 
   function showQr(d) {
     $('qrName').textContent = d.name;
-    const url = AL.qrDataUrl(AL.buildVCard(d), 512);
+    const url = AL.qrDataUrl(AL.buildVCard(d, false), 512);
     $('qrImg').src = url;
     $('qrDownload').onclick = () => {
       if (url.startsWith('data:')) AL.downloadDataUrl(url, 'QR-' + AL.safeName(d.name) + '.png');
@@ -272,6 +276,7 @@ td.actions button { margin: 2px; }
   function openEdit(d) {
     editing = d;
     $('eName').value = d.name || '';
+    $('eManager').value = d.manager || '';
     $('eType').value = d.type || 'business';
     $('ePhones').value = phonesOf(d).join('\n');
     const sel = $('eCategory');
@@ -296,6 +301,7 @@ td.actions button { margin: 2px; }
   $('eCancel').addEventListener('click', () => $('editModal').classList.remove('active'));
   $('eSave').addEventListener('click', async () => {
     const name = $('eName').value.trim();
+    const manager = $('eManager').value.trim();
     const phones = $('ePhones').value.split(/[,،\n]+/).map(AL.normDigits).filter(Boolean);
     if (!name || !phones.length) { $('editError').textContent = 'نام و حداقل یک شماره لازم است.'; return; }
 
@@ -309,7 +315,7 @@ td.actions button { margin: 2px; }
     const rubika = AL.normRubika($('eRubika').value.trim());
 
     const patch = {
-      name, phones,
+      name, manager, phones,
       type: $('eType').value,
       category: $('eCategory').value,
       title: $('eTitle').value.trim(),
@@ -336,14 +342,14 @@ td.actions button { margin: 2px; }
     } catch (e) { alert('حذف ناموفق بود: ' + e.message); }
   }
 
-  // ---------- خروجی ----------
+  // ---------- خروجی بک‌آپ ----------
   function exportList(kind) {
     const list = filtered();
-    if (!list.length) { alert('موردی برای خروجی وجود ندارد.'); return; }
+    if (!list.length) { alert('موردی برای خروجی یافت نشد.'); return; }
     const stamp = Date.now();
-    if (kind === 'csv') AL.downloadText(`customers-${stamp}.csv`, AL.toCsv(list), 'text/csv;charset=utf-8');
-    else if (kind === 'vcf') AL.downloadText(`customers-${stamp}.vcf`, AL.vcardsFile(list), 'text/vcard;charset=utf-8');
-    else AL.downloadText(`customers-${stamp}.json`, JSON.stringify({ exportedAt: new Date().toISOString(), total: list.length, customers: list }, null, 2), 'application/json');
+    if (kind === 'csv') AL.downloadText(`customers-backup-${stamp}.csv`, AL.toCsv(list), 'text/csv;charset=utf-8');
+    else if (kind === 'vcf') AL.downloadText(`customers-backup-${stamp}.vcf`, AL.vcardsFile(list), 'text/vcard;charset=utf-8');
+    else AL.downloadText(`customers-backup-${stamp}.json`, JSON.stringify({ exportedAt: new Date().toISOString(), total: list.length, customers: list }, null, 2), 'application/json');
   }
 
   $('btnCsv').addEventListener('click', () => exportList('csv'));
@@ -352,10 +358,11 @@ td.actions button { margin: 2px; }
   $('btnReload').addEventListener('click', loadData);
   $('search').addEventListener('input', render);
 
-  // ---------- ورود / خروج ----------
+  // ---------- ورود / خروج و بازیابی رمز عبور ----------
   $('login').addEventListener('submit', async e => {
     e.preventDefault();
     $('loginError').textContent = '';
+    $('resetSuccess').style.display = 'none';
     const email = $('email').value.trim();
     const password = $('password').value;
     try {
@@ -364,6 +371,30 @@ td.actions button { margin: 2px; }
       $('loginError').textContent = 'ورود ناموفق: ایمیل یا رمز عبور اشتباه است.';
     }
   });
+
+  $('btnForgot').addEventListener('click', async () => {
+    const email = $('email').value.trim();
+    if (!email) {
+      alert('لطفاً ابتدا ایمیل خود را در کادر ایمیل ادمین وارد کنید.');
+      $('email').focus();
+      return;
+    }
+    $('loginError').textContent = '';
+    $('resetSuccess').style.display = 'none';
+    try {
+      await sendPasswordResetEmail(auth, email);
+      $('resetSuccess').textContent = `✅ لینک بازیابی رمز به ایمیل ${email} ارسال شد! صندوق ورودی (Inbox) و اسپم را چک کنید.`;
+      $('resetSuccess').style.display = 'block';
+    } catch (err) {
+      console.error("Forgot password error:", err);
+      if (err.code === 'auth/user-not-found') {
+        $('loginError').textContent = 'کاربری با این آدرس ایمیل در سیستم ثبت نشده است.';
+      } else {
+        $('loginError').textContent = 'خطا در ارسال ایمیل بازیابی: ' + err.message;
+      }
+    }
+  });
+
   $('btnLogout').addEventListener('click', () => signOut(auth));
 
   onAuthStateChanged(auth, user => {

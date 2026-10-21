@@ -231,11 +231,21 @@
   AL.buildVCard = function (d, includePhoto = true) {
     const phones = Array.isArray(d.phones) ? d.phones : (d.phone ? [d.phone] : []);
     let v = 'BEGIN:VCARD\r\nVERSION:3.0\r\n';
-    v += 'N:' + AL.vEsc(d.name) + ';;;;\r\n';
-    v += 'FN:' + AL.vEsc(d.name) + '\r\n';
-    if (d.type === 'business') v += 'ORG:' + AL.vEsc(d.name) + '\r\n';
+    if (d.type === 'business' && d.manager) {
+      v += 'N:' + AL.vEsc(d.manager) + ';;;;\r\n';
+      v += 'FN:' + AL.vEsc(d.name + ' (' + d.manager + ')') + '\r\n';
+      v += 'ORG:' + AL.vEsc(d.name) + '\r\n';
+    } else {
+      v += 'N:' + AL.vEsc(d.name) + ';;;;\r\n';
+      v += 'FN:' + AL.vEsc(d.name) + '\r\n';
+      if (d.type === 'business') v += 'ORG:' + AL.vEsc(d.name) + '\r\n';
+    }
     if (d.title) v += 'TITLE:' + AL.vEsc(d.title) + '\r\n';
-    if (d.description) v += 'NOTE:' + AL.vEsc(d.description) + '\r\n';
+    let note = d.description || '';
+    if (d.manager && d.type === 'business') {
+      note = (note ? note + ' | ' : '') + 'مدیریت: ' + d.manager;
+    }
+    if (note) v += 'NOTE:' + AL.vEsc(note) + '\r\n';
     phones.forEach((p, i) => { v += 'TEL;TYPE=' + (i === 0 ? 'CELL' : 'WORK') + ':' + p + '\r\n'; });
     if (d.email) v += 'EMAIL;TYPE=INTERNET:' + AL.vEsc(d.email) + '\r\n';
     if (d.address) v += 'ADR;TYPE=WORK:;;' + AL.vEsc(d.address) + ';;;;\r\n';
@@ -357,16 +367,34 @@
     return 'https://api.qrserver.com/v1/create-qr-code/?size=500x500&margin=10&charset-source=UTF-8&data=' + encodeURIComponent(text);
   };
 
-  // ---------- دانلود ----------
+  // ---------- دانلود مطمئن در موبایل و دسکتاپ ----------
   AL.downloadBlob = function (blob, filename) {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    try {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        try { document.body.removeChild(a); } catch (e) {}
+        URL.revokeObjectURL(url);
+      }, 2000);
+    } catch (e) {
+      const reader = new FileReader();
+      reader.onload = function (evt) {
+        const a = document.createElement('a');
+        a.href = evt.target.result;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          try { document.body.removeChild(a); } catch (err) {}
+        }, 1000);
+      };
+      reader.readAsDataURL(blob);
+    }
   };
 
   AL.downloadText = (filename, text, mime) =>
@@ -408,17 +436,18 @@
   };
 
   AL.toCsv = function (list) {
-    let csv = '\uFEFFردیف,نام,شماره تماس,نوع,سرفصل (دسته‌بندی),عنوان شغلی,توضیحات,ایمیل,وب‌سایت,آدرس,اینستاگرام,واتساپ,تلگرام,ایتا,بله,روبیکا,عرض جغرافیایی,طول جغرافیایی,تاریخ\n';
+    let csv = '\uFEFFردیف,نام کسب‌وکار / شخص,مدیریت,شماره تماس,نوع,سرفصل (دسته‌بندی),عنوان شغلی,توضیحات,ایمیل,وب‌سایت,آدرس,اینستاگرام,واتساپ,تلگرام,ایتا,بله,روبیکا,عرض جغرافیایی,طول جغرافیایی,تاریخ\n';
     list.forEach((d, i) => {
       const plist = (Array.isArray(d.phones) ? d.phones : (d.phone ? [d.phone] : [])).map(p => String(p).replace(/"/g, ''));
-      const phones = plist.length ? '="' + plist.join(' - ') + '"' : '';
+      const phones = plist.length ? plist.join(' - ') : '';
       const type = d.type === 'business' ? 'کسب‌وکار' : (d.type === 'personal' ? 'شخصی' : '-');
       const when = d.createdAt || d.savedAt;
       const date = when ? new Date(when).toLocaleDateString('fa-IR') : '-';
       csv += [
         i + 1,
         csvCell(d.name),
-        '"' + phones.replace(/"/g, '""') + '"',
+        csvCell(d.manager),
+        csvCell(phones),
         csvCell(type),
         csvCell(d.category),
         csvCell(d.title),
@@ -427,7 +456,7 @@
         csvCell(d.website),
         csvCell(d.address),
         csvCell(d.instagram),
-        (d.whatsapp ? '"=""' + d.whatsapp + '"""' : '""'),
+        csvCell(d.whatsapp),
         csvCell(d.telegram),
         csvCell(d.eitaa),
         csvCell(d.bale),
