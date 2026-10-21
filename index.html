@@ -491,7 +491,7 @@ const translations = {
     btnSaveCloud: '☁️ Save to my cloud panel', btnSaveCloudDone: '✅ Saved in cloud panel',
     btnSavePhone: '📱 Save on this phone', btnSavePhoneDone: '✅ Saved on phone (tap to update)',
     btnNewCard: '➕ New card',
-    creatorText: '<strong>Creator:</strong> Artemin Land<br>📞 09153136173 | 09150086173',
+    creatorText: '<strong>Creator:</strong> Artemin Land<br>📞 09153136173 | 09150086173 | 09053660062',
     adminLink: '🔐 Admin panel',
     titlePlaceholder: 'e.g. CEO, Engineer', descriptionPlaceholder: 'e.g. Home appliances store', addressPlaceholder: 'Enter address or use GPS',
     namePlaceholderBusiness: 'Business name', namePlaceholderPersonal: 'Full name',
@@ -499,7 +499,7 @@ const translations = {
     name: 'Name', phone: 'Phone', title: 'Title', address: 'Address', category: 'Category', description: 'Description', type: 'Type', coords: 'Coordinates',
     email: 'Email', website: 'Website',
     creatorName: 'Artemin Land', creatorTitle: 'QR Code Creation | Content Creation | Graphic Design | Interior Decoration',
-    creatorPhones: '09153136173 - 09150086173', creatorAddress: 'Mashhad, Iran',
+    creatorPhones: '09153136173 - 09150086173 - 09053660062', creatorAddress: 'Mashhad, Iran',
     noQR: 'No QR!', business: 'Business', personal: 'Personal',
     detecting: '⏳ Detecting location...', detectingAddress: '🗺️ Detecting address...', ipLocation: '🌐 Using IP location...',
     locationError: '⚠️ Could not detect location. Enter manually.', locationNotSupported: '❌ Location not supported. Enter manually.',
@@ -554,15 +554,15 @@ const translations = {
     btnSaveCloud: '☁️ ذخیره در پنل ابری من', btnSaveCloudDone: '✅ در پنل ابری ذخیره شد',
     btnSavePhone: '📱 ذخیره در همین گوشی', btnSavePhoneDone: '✅ در گوشی ذخیره شد (لمس = به‌روزرسانی)',
     btnNewCard: '➕ کارت جدید',
-    creatorText: '<strong>سازنده:</strong> آرتمین لند<br>📞 ۰۹۱۵۳۱۳۶۱۷۳ | ۰۹۱۵۰۰۸۶۱۷۳',
+    creatorText: '<strong>سازنده:</strong> آرتمین لند<br>📞 ۰۹۱۵۳۱۳۶۱۷۳ | ۰۹۱۵۰۰۸۶۱۷۳ | ۰۹۰۵۳۶۶۰۰۶۲',
     adminLink: '🔐 پنل مدیریت',
     titlePlaceholder: 'مثال: مدیر عامل، مهندس عمران', descriptionPlaceholder: 'مثال: فروشگاه لوازم خانگی، فروشنده لوازم یدکی', addressPlaceholder: 'آدرس را وارد کنید یا از GPS استفاده کنید',
     namePlaceholderBusiness: 'نام کسب‌وکار', namePlaceholderPersonal: 'نام و نام خانوادگی',
     alertFill: 'لطفاً نام و تلفن را وارد کنید!',
     name: 'نام', phone: 'تلفن', title: 'عنوان', address: 'آدرس', category: 'دسته‌بندی', description: 'توضیحات', type: 'نوع', coords: 'مختصات',
     email: 'ایمیل', website: 'وب‌سایت',
-    creatorName: 'آرتمین لند', creatorTitle: 'ساخت کیو آر کد برای هر صنفی | تولید محتوا | طراحی گرافیک | دکوراسیون داخلی',
-    creatorPhones: '۰۹۱۵۳۱۳۶۱۷۳ - ۰۹۱۵۰۰۸۶۱۷۳', creatorAddress: 'مشهد، ایران',
+    creatorName: 'آرتمین لند (Artemin Land)', creatorTitle: 'ساخت کیو آر کد برای هر صنفی | تولید محتوا | طراحی گرافیک | دکوراسیون داخلی',
+    creatorPhones: '۰۹۱۵۳۱۳۶۱۷۳ - ۰۹۱۵۰۰۸۶۱۷۳ - ۰۹۰۵۳۶۶۰۰۶۲', creatorAddress: 'مشهد، ایران',
     noQR: 'کیو آر کدی وجود ندارد!', business: 'کسب‌وکار', personal: 'شخصی',
     detecting: '⏳ در حال تشخیص موقعیت...', detectingAddress: '🗺️ در حال تشخیص آدرس...', ipLocation: '🌐 استفاده از موقعیت IP...',
     locationError: '⚠️ تشخیص موقعیت ممکن نبود. دستی وارد کنید.', locationNotSupported: '❌ موقعیت پشتیبانی نمی‌شود. دستی وارد کنید.',
@@ -932,8 +932,16 @@ $('form').addEventListener('submit', function (e) {
   $('info-creator').innerHTML =
     `<p><strong>${t.name}:</strong> ${t.creatorName}</p>` +
     `<p><strong>${t.title}:</strong> ${t.creatorTitle}</p>` +
-    `<p><strong>${t.phone}:</strong> ${t.creatorPhones}</p>` +
-    `<p><strong>${t.address}:</strong> ${t.creatorAddress}</p>`;
+    `<p><strong>${t.phone}:</strong> <span dir="ltr">${t.creatorPhones}</span></p>` +
+    `<p><strong>${t.address}:</strong> ${t.creatorAddress}</p>` +
+    `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">` +
+    `  <a href="https://instagram.com/artminland" target="_blank" rel="noopener" style="background:#e1306c;color:white;padding:4px 9px;border-radius:6px;font-size:12px;text-decoration:none;font-weight:bold;">📸 اینستاگرام</a>` +
+    `  <a href="https://t.me/artminland" target="_blank" rel="noopener" style="background:#0088cc;color:white;padding:4px 9px;border-radius:6px;font-size:12px;text-decoration:none;font-weight:bold;">✈️ تلگرام</a>` +
+    `  <a href="https://eitaa.com/artminland" target="_blank" rel="noopener" style="background:#e67e22;color:white;padding:4px 9px;border-radius:6px;font-size:12px;text-decoration:none;font-weight:bold;">🔸 ایتا</a>` +
+    `  <a href="https://rubika.ir/artminland" target="_blank" rel="noopener" style="background:#8e44ad;color:white;padding:4px 9px;border-radius:6px;font-size:12px;text-decoration:none;font-weight:bold;">🔴 روبیکا</a>` +
+    `  <a href="https://ble.ir/artminland" target="_blank" rel="noopener" style="background:#27ae60;color:white;padding:4px 9px;border-radius:6px;font-size:12px;text-decoration:none;font-weight:bold;">🔹 بله</a>` +
+    `  <a href="https://wa.me/989153136173" target="_blank" rel="noopener" style="background:#25d366;color:white;padding:4px 9px;border-radius:6px;font-size:12px;text-decoration:none;font-weight:bold;">💬 واتساپ</a>` +
+    `</div>`;
 
   $('btn-google-maps').style.display = card.registerGoogle ? 'block' : 'none';
   $('btn-neshan-map').style.display = card.registerNeshan ? 'block' : 'none';

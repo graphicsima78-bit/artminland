@@ -241,15 +241,23 @@
     return v;
   };
 
-  AL.CREATOR_VCARD = [
-    'BEGIN:VCARD', 'VERSION:3.0',
-    'N:Artemin Land;;;;', 'FN:Artemin Land', 'ORG:Artemin Land',
-    'TITLE:' + AL.vEsc('ساخت کیو آر کد | تولید محتوا | طراحی گرافیک | دکوراسیون داخلی'),
-    'TEL;TYPE=CELL:09153136173', 'TEL;TYPE=WORK:09150086173',
-    'ADR;TYPE=WORK:;;;' + AL.vEsc('مشهد') + ';;;' + AL.vEsc('ایران'),
-    'NOTE:' + AL.vEsc('ساخت کیو آر کد برای شما در هر صنفی | تولید محتوا (اینستاگرام، یوتیوب و همه شبکه‌های اجتماعی) | طراحی گرافیک | دکوراسیون داخلی'),
-    'END:VCARD'
-  ].join('\r\n');
+  // اطلاعات رسمی سازنده (آرتمین لند) به همراه ۳ شماره تماس و تمام شبکه‌های اجتماعی
+  AL.CREATOR_DATA = {
+    name: 'Artemin Land | آرتمین لند',
+    type: 'business',
+    title: 'ساخت کیو آر کد | تولید محتوا | طراحی گرافیک | دکوراسیون داخلی',
+    phones: ['09153136173', '09150086173', '09053660062'],
+    whatsapp: '989153136173',
+    instagram: 'artminland',
+    telegram: 'artminland',
+    eitaa: 'artminland',
+    rubika: 'artminland',
+    bale: 'artminland',
+    address: 'مشهد، ایران',
+    description: 'بیست و پنج سال سابقه در حوزه طراحی، تبلیغات، تولید محتوا و ساخت کارت ویزیت دیجیتال'
+  };
+
+  AL.CREATOR_VCARD = AL.buildVCard(AL.CREATOR_DATA);
 
   // چند کارت در یک فایل .vcf (برای وارد کردن یکجا به مخاطبین)
   AL.vcardsFile = list => list.map(AL.buildVCard).join('\r\n') + '\r\n';
