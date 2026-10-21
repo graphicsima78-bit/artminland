@@ -68,6 +68,8 @@
 
   // شماره واتساپ → قالب بین‌المللی بدون + (۰۹۱۵۱۲۳۴۵۶۷ → 989151234567)
   AL.normWhatsapp = s => {
+    const scanned = AL.parseScanned(String(s || '').trim());
+    if (scanned && scanned.type === 'whatsapp') s = scanned.value;
     let v = AL.normDigits(s);
     const plus = v.startsWith('+');
     v = v.replace(/\+/g, '');
@@ -386,5 +388,27 @@
     return csv;
   };
 
+  // Public, self-contained card links. No database read permissions required.
+  AL.cardUrl = function (card) {
+    const fields = ['name','title','description','address','phones','type','instagram','telegram','whatsapp','eitaa','bale','rubika','email','website'];
+    const data = {};
+    fields.forEach(k => { if (card[k]) data[k] = card[k]; });
+    const bytes = new TextEncoder().encode(JSON.stringify(data));
+    const encoded = btoa(Array.from(bytes, b => String.fromCharCode(b)).join('')).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    return new URL('card.html', location.href).href.split('#')[0] + '#v1.' + encoded;
+  };
+  AL.readCard = function (hash) {
+    if (!hash.startsWith('#v1.') || hash.length > 24000) throw new Error('Invalid card');
+    let raw = hash.slice(4).replace(/-/g, '+').replace(/_/g, '/');
+    raw += '='.repeat((4 - raw.length % 4) % 4);
+    const d = JSON.parse(new TextDecoder('utf-8', {fatal: true}).decode(Uint8Array.from(atob(raw), c => c.charCodeAt(0))));
+    if (!d || typeof d !== 'object' || typeof d.name !== 'string') throw new Error('Invalid card');
+    const out = {};
+    ['name','title','description','address','type'].forEach(k => { if (typeof d[k] === 'string') out[k] = d[k].slice(0, 4000); });
+    const normalizers = {instagram:AL.normInstagram, telegram:AL.normTelegram, whatsapp:AL.normWhatsapp, eitaa:AL.normEitaa, bale:AL.normBale, rubika:AL.normRubika, email:AL.normEmail, website:AL.normUrl};
+    Object.keys(normalizers).forEach(k => { if (typeof d[k] === 'string') out[k] = normalizers[k](d[k]); });
+    out.phones = Array.isArray(d.phones) ? d.phones.filter(v => typeof v === 'string').slice(0,20).map(AL.normDigits).filter(Boolean) : [];
+    return out;
+  };
   window.AL = AL;
 })();

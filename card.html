@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#10100e"><title>کارت عمومی | آرتمین لند</title><link rel="icon" href="icon-192.png"><style>*{box-sizing:border-box}body{margin:0;background:#090909;color:#f6e8c7;font-family:Tahoma,Arial,sans-serif;line-height:1.9}main{max-width:520px;margin:28px auto;padding:26px 22px;background:linear-gradient(145deg,#242015,#101010);border:1px solid #97702e;border-radius:26px;box-shadow:0 18px 80px #000}header{text-align:center}img{width:118px;height:118px;object-fit:contain}h1{font-size:25px;margin:14px 0 5px}#title{color:#d3af67}#description,#address{white-space:pre-wrap;overflow-wrap:anywhere}#links{display:grid;gap:12px;margin:22px 0}a,button{display:block;width:100%;padding:13px 16px;border-radius:13px;border:1px solid #a87a31;color:#ffe2a1;background:#211c13;text-decoration:none;font:inherit;text-align:center;cursor:pointer;overflow-wrap:anywhere}a:hover,button:hover{background:#382b15}button{margin-top:12px;background:#bd9146;color:#101010;font-weight:bold}footer{font-size:12px;color:#b1a58b;text-align:center;margin-top:24px}#error{color:#ffcfab} @media(max-width:560px){main{margin:12px;border-radius:20px}}</style></head><body><main><header><img src="icon-512.png" alt="لوگوی آرتمین لند"><h1 id="name">کارت عمومی آرتمین لند</h1><p id="title"></p></header><p id="description"></p><p id="address"></p><p id="error" hidden>لینک کارت ناقص یا نامعتبر است. لطفاً لینک کامل یا QR جدید را از صاحب کارت دریافت کنید.</p><div id="links"></div><button id="save" hidden>ذخیره در مخاطبین</button><button id="share" hidden>اشتراک‌گذاری لینک کارت</button><footer>برای باز کردن صفحهٔ هر شبکه، دکمهٔ آن را لمس کنید.<br>این کارت عمومی است. اطلاعات آن توسط صاحب لینک ارائه شده و تأیید هویت نشده است.<br>با تغییر اطلاعات، لینک و QR جدید ساخته می‌شود.</footer></main><script src="common.js"></script><script>
+(function(){
+'use strict';
+const el=id=>document.getElementById(id);
+function addLink(label,url){const a=document.createElement('a');a.textContent=label;a.href=url;a.target='_blank';a.rel='noopener noreferrer';el('links').appendChild(a);}
+try{
+const c=AL.readCard(location.hash);
+el('name').textContent=c.name;document.title=c.name+' | آرتمین لند';
+['title','description','address'].forEach(k=>el(k).textContent=c[k]||'');
+c.phones.forEach(n=>addLink('☎ تماس: '+n,'tel:'+n));
+AL.socialLinks(c).forEach(s=>addLink(s.label+' — '+s.value,s.url));
+el('save').hidden=false;el('save').onclick=()=>AL.downloadText('Contact-'+AL.safeName(c.name)+'.vcf',AL.buildVCard(c)+'\r\n','text/vcard;charset=utf-8');
+el('share').hidden=false;el('share').onclick=async()=>{try{if(navigator.share){await navigator.share({title:c.name,url:location.href});}else if(navigator.clipboard){await navigator.clipboard.writeText(location.href);el('share').textContent='✅ لینک کپی شد';}else{prompt('لینک کارت را کپی کنید:',location.href);}}catch(e){if(e.name!=='AbortError')prompt('لینک کارت را کپی کنید:',location.href);}};
+}catch(e){el('error').hidden=false;}
+})();
+</script></body></html>

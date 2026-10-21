@@ -3,6 +3,7 @@ const CACHE_NAME = 'artemin-land-v5';
 const ASSETS = [
   './',
   './index.html',
+  './card.html',
   './manifest.json',
   './common.js',
   './qrcode.min.js',

@@ -484,7 +484,7 @@ const translations = {
     btnGenerate: '⚡ Generate QR Codes', resultTitle: '✅ QR Cards Ready!',
     mapTitle: '🌐 Map Registration', mapHint: 'One tap: copy the info and open the map app',
     btnGoogleMaps: '📍 Register on Google Maps', btnNeshan: '🗺️ Register on Neshan',
-    qr1Title: '📱 QR 1: Your Card', qr1Hint: 'Scan to save contact',
+    qr1Title: '📱 QR 1: Your Card', qr1Hint: 'Scan to open your public card and social links',
     qr2Title: '🛠️ QR 2: Artemin Land', qr2Hint: 'Creator of this card',
     btnDownload: '📥 Download QR', btnDownloadJson: '💾 Info (JSON)',
     btnContact: '👤 Add to contacts', btnShare: '📤 Share / Send',
@@ -547,7 +547,7 @@ const translations = {
     btnGenerate: '⚡ ساخت کیو آر کد', resultTitle: '✅ کیو آر کد آماده است!',
     mapTitle: '🌐 ثبت در نقشه', mapHint: 'یک لمس: اطلاعات کپی می‌شود و نقشه باز می‌شود',
     btnGoogleMaps: '📍 ثبت در گوگل مپ', btnNeshan: '🗺️ ثبت در نشان',
-    qr1Title: '📱 کیو آر ۱: کارت شما', qr1Hint: 'برای ذخیره مخاطب اسکن کنید',
+    qr1Title: '📱 کیو آر ۱: کارت شما', qr1Hint: 'برای باز کردن کارت عمومی و شبکه‌های اجتماعی اسکن کنید',
     qr2Title: '🛠️ کیو آر ۲: آرتمین لند', qr2Hint: 'سازنده این کارت',
     btnDownload: '📥 دانلود QR', btnDownloadJson: '💾 اطلاعات (JSON)',
     btnContact: '👤 افزودن به مخاطبین', btnShare: '📤 اشتراک / ارسال',
@@ -830,6 +830,7 @@ function onScanSuccess(decodedText) {
       if (v.instagram) $('instagram').value = v.instagram;
       if (v.telegram) $('telegram').value = v.telegram;
       if (v.eitaa) $('eitaa').value = v.eitaa;
+      ['bale','rubika','whatsapp'].forEach(k => { if (v[k]) $(k).value = v[k]; });
       showStatus('✅ اطلاعات کارت ویزیت با موفقیت درج شد.', 'success');
     }
     return;
@@ -908,7 +909,12 @@ $('form').addEventListener('submit', function (e) {
   lastFormData = card;
   cloudSaved = false;
 
-  $('qr-main').src = AL.qrDataUrl(AL.buildVCard(card), 512);
+  try {
+    $('qr-main').src = AL.qrDataUrl(AL.cardUrl(card), 512);
+  } catch (err) {
+    alert('اطلاعات برای ساخت QR بیش از حد طولانی است. توضیحات یا آدرس را کوتاه‌تر کنید و دوباره کارت بسازید.');
+    return;
+  }
   $('qr-creator').src = AL.qrDataUrl(AL.CREATOR_VCARD, 512);
 
   let info = `<p><strong>${t.name}:</strong> ${esc(name)}</p>`;
@@ -927,7 +933,13 @@ $('form').addEventListener('submit', function (e) {
       info += `<p><strong>${s.label}:</strong> <a href="${esc(s.url)}" target="_blank" rel="noopener" dir="ltr">${esc(s.value)}</a></p>`;
     }
   });
+  const publicUrl = AL.cardUrl(card);
+  info += `<p><a href="${esc(publicUrl)}" target="_blank" rel="noopener">🌐 باز کردن صفحه عمومی کارت و شبکه‌های اجتماعی</a></p><p style="font-size:12px">این لینک عمومی است؛ اطلاعات حساس وارد نکنید. تغییر اطلاعات، لینک و QR تازه می‌سازد.</p>`;
   $('info-main').innerHTML = info;
+  const copyLink = document.createElement('button');
+  copyLink.type = 'button'; copyLink.textContent = '🔗 کپی لینک عمومی کارت';
+  copyLink.onclick = async () => { await copyText(publicUrl); copyLink.textContent = '✅ لینک کپی شد'; };
+  $('info-main').appendChild(copyLink);
 
   $('info-creator').innerHTML =
     `<p><strong>${t.name}:</strong> ${t.creatorName}</p>` +
@@ -1133,7 +1145,7 @@ function exportSaved(kind) {
 }
 
 function showQrModal(card) {
-  const url = AL.qrDataUrl(AL.buildVCard(card), 512);
+  const url = AL.qrDataUrl(AL.cardUrl(card), 512);
   $('qrModal-name').textContent = card.name;
   $('qrModal-img').src = url;
   $('qrModal-download').onclick = () => {
