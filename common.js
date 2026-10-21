@@ -18,65 +18,66 @@
 
   AL.safeName = s => String(s || 'file').replace(/[^\w\u0600-\u06FF-]+/g, '_').slice(0, 40);
 
-  // ---------- نرمال‌سازی شبکه‌های اجتماعی و پیام‌رسان‌ها ----------
+  // ---------- نرمال‌سازی منعطف شبکه‌های اجتماعی (بدون خطا یا بلاک کردن کاربر) ----------
   AL.normInstagram = s => {
-    let v = String(s || '').trim().replace(/^https?:\/\/(www\.)?(instagram\.com|instagr\.am)\//i, '');
-    v = v.split(/[/?#]/)[0].replace(/^@+/, '');
-    return /^[A-Za-z0-9._]{1,30}$/.test(v) ? v : '';
+    let v = String(s || '').trim();
+    if (!v) return '';
+    if (/^https?:\/\//i.test(v)) return v;
+    return v.replace(/^@+/, '').replace(/\s+/g, '');
   };
 
   AL.normTelegram = s => {
-    let v = String(s || '').trim().replace(/^https?:\/\/(www\.)?(t\.me|telegram\.me)\//i, '').replace(/^(t\.me|telegram\.me)\//i, '');
-    v = v.split(/[/?#]/)[0].replace(/^@+/, '');
-    return /^[A-Za-z0-9_]{4,32}$/.test(v) ? v : '';
+    let v = String(s || '').trim();
+    if (!v) return '';
+    if (/^https?:\/\//i.test(v)) return v;
+    return v.replace(/^@+/, '').replace(/\s+/g, '');
   };
 
   AL.normEitaa = s => {
-    let v = String(s || '').trim().replace(/^https?:\/\/(www\.)?eitaa\.(com|org|ir)\//i, '').replace(/^eitaa\.(com|org|ir)\//i, '');
-    v = v.split(/[/?#]/)[0].replace(/^@+/, '');
-    return /^[A-Za-z0-9_]{3,32}$/.test(v) ? v : '';
+    let v = String(s || '').trim();
+    if (!v) return '';
+    if (/^https?:\/\//i.test(v)) return v;
+    return v.replace(/^@+/, '').replace(/\s+/g, '');
   };
 
   AL.normBale = s => {
-    let v = String(s || '').trim().replace(/^https?:\/\/(www\.)?ble\.(ir|im)\//i, '').replace(/^ble\.(ir|im)\//i, '');
-    v = v.split(/[/?#]/)[0].replace(/^@+/, '');
-    return /^[A-Za-z0-9_]{3,32}$/.test(v) ? v : '';
+    let v = String(s || '').trim();
+    if (!v) return '';
+    if (/^https?:\/\//i.test(v)) return v;
+    return v.replace(/^@+/, '').replace(/\s+/g, '');
   };
 
   AL.normRubika = s => {
-    let v = String(s || '').trim().replace(/^https?:\/\/(www\.)?rubika\.(ir|com)\/(joinc\/)?/i, '').replace(/^rubika\.(ir|com)\//i, '');
-    v = v.split(/[/?#]/)[0].replace(/^@+/, '');
-    return /^[A-Za-z0-9_]{3,32}$/.test(v) ? v : '';
+    let v = String(s || '').trim();
+    if (!v) return '';
+    if (/^https?:\/\//i.test(v)) return v;
+    return v.replace(/^@+/, '').replace(/\s+/g, '');
   };
 
   AL.normEmail = s => {
     let v = String(s || '').trim().replace(/^mailto:/i, '');
-    return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(v) ? v.toLowerCase() : '';
+    return v;
   };
 
   AL.normUrl = s => {
     let v = String(s || '').trim();
     if (!v) return '';
     if (!/^https?:\/\//i.test(v)) v = 'https://' + v;
-    try {
-      const u = new URL(v);
-      return u.href;
-    } catch (e) {
-      return '';
-    }
+    return v;
   };
 
   // شماره واتساپ → قالب بین‌المللی بدون + (۰۹۱۵۱۲۳۴۵۶۷ → 989151234567)
   AL.normWhatsapp = s => {
-    const scanned = AL.parseScanned(String(s || '').trim());
-    if (scanned && scanned.type === 'whatsapp') s = scanned.value;
-    let v = AL.normDigits(s);
-    const plus = v.startsWith('+');
-    v = v.replace(/\+/g, '');
-    if (v.startsWith('00')) v = v.slice(2);
-    else if (!plus && v.startsWith('0')) v = '98' + v.slice(1);
-    else if (!plus && v.length === 10 && v.startsWith('9')) v = '98' + v;
-    return /^\d{8,15}$/.test(v) ? v : '';
+    let v = String(s || '').trim();
+    if (!v) return '';
+    if (/^https?:\/\//i.test(v)) return v;
+    let digits = AL.normDigits(v);
+    const plus = digits.startsWith('+');
+    digits = digits.replace(/\+/g, '');
+    if (digits.startsWith('00')) digits = digits.slice(2);
+    else if (!plus && digits.startsWith('0')) digits = '98' + digits.slice(1);
+    else if (!plus && digits.length === 10 && digits.startsWith('9')) digits = '98' + digits;
+    return digits || v;
   };
 
   // ---------- آنالیزور هوشمند کدهای اسکن‌شده با دوربین یا گالری ----------
@@ -180,12 +181,43 @@
   // لیست لینک‌های شبکه‌های اجتماعی برای نمایش و کارت
   AL.socialLinks = d => {
     const out = [];
-    if (d && d.instagram) out.push({ key: 'instagram', label: 'اینستاگرام', value: '@' + d.instagram, url: 'https://instagram.com/' + encodeURIComponent(d.instagram) });
-    if (d && d.telegram) out.push({ key: 'telegram', label: 'تلگرام', value: '@' + d.telegram, url: 'https://t.me/' + encodeURIComponent(d.telegram) });
-    if (d && d.eitaa) out.push({ key: 'eitaa', label: 'ایتا', value: '@' + d.eitaa, url: 'https://eitaa.com/' + encodeURIComponent(d.eitaa) });
-    if (d && d.bale) out.push({ key: 'bale', label: 'بله', value: '@' + d.bale, url: 'https://ble.ir/' + encodeURIComponent(d.bale) });
-    if (d && d.rubika) out.push({ key: 'rubika', label: 'روبیکا', value: '@' + d.rubika, url: 'https://rubika.ir/' + encodeURIComponent(d.rubika) });
-    if (d && d.whatsapp) out.push({ key: 'whatsapp', label: 'واتساپ', value: '+' + d.whatsapp, url: 'https://wa.me/' + encodeURIComponent(d.whatsapp) });
+    if (d && d.instagram) {
+      const isUrl = /^https?:\/\//i.test(d.instagram);
+      const url = isUrl ? d.instagram : 'https://instagram.com/' + encodeURIComponent(d.instagram);
+      const val = isUrl ? d.instagram.replace(/^https?:\/\/(www\.)?instagram\.com\//i, '@') : '@' + d.instagram;
+      out.push({ key: 'instagram', label: 'اینستاگرام', value: val, url });
+    }
+    if (d && d.telegram) {
+      const isUrl = /^https?:\/\//i.test(d.telegram);
+      const url = isUrl ? d.telegram : 'https://t.me/' + encodeURIComponent(d.telegram);
+      const val = isUrl ? d.telegram.replace(/^https?:\/\/(www\.)?(t\.me|telegram\.me)\//i, '@') : '@' + d.telegram;
+      out.push({ key: 'telegram', label: 'تلگرام', value: val, url });
+    }
+    if (d && d.eitaa) {
+      const isUrl = /^https?:\/\//i.test(d.eitaa);
+      const url = isUrl ? d.eitaa : 'https://eitaa.com/' + encodeURIComponent(d.eitaa);
+      const val = isUrl ? d.eitaa.replace(/^https?:\/\/(www\.)?eitaa\.(com|org|ir)\//i, '@') : '@' + d.eitaa;
+      out.push({ key: 'eitaa', label: 'ایتا', value: val, url });
+    }
+    if (d && d.bale) {
+      const isUrl = /^https?:\/\//i.test(d.bale);
+      const url = isUrl ? d.bale : 'https://ble.ir/' + encodeURIComponent(d.bale);
+      const val = isUrl ? d.bale.replace(/^https?:\/\/(www\.)?ble\.(ir|im)\//i, '@') : '@' + d.bale;
+      out.push({ key: 'bale', label: 'بله', value: val, url });
+    }
+    if (d && d.rubika) {
+      const isUrl = /^https?:\/\//i.test(d.rubika);
+      const url = isUrl ? d.rubika : 'https://rubika.ir/' + encodeURIComponent(d.rubika);
+      const val = isUrl ? d.rubika.replace(/^https?:\/\/(www\.)?rubika\.(ir|com)\//i, '@') : '@' + d.rubika;
+      out.push({ key: 'rubika', label: 'روبیکا', value: val, url });
+    }
+    if (d && d.whatsapp) {
+      const isUrl = /^https?:\/\//i.test(d.whatsapp);
+      const num = AL.normDigits(d.whatsapp);
+      const url = isUrl ? d.whatsapp : ('https://wa.me/' + (num.startsWith('0') ? '98' + num.slice(1) : num));
+      const val = isUrl ? d.whatsapp : ('+' + (num.startsWith('0') ? '98' + num.slice(1) : num));
+      out.push({ key: 'whatsapp', label: 'واتساپ', value: val, url });
+    }
     if (d && d.email) out.push({ key: 'email', label: 'ایمیل', value: d.email, url: 'mailto:' + encodeURIComponent(d.email) });
     if (d && d.website) out.push({ key: 'website', label: 'وب‌سایت', value: d.website.replace(/^https?:\/\//i, ''), url: d.website });
     return out;
@@ -195,8 +227,8 @@
 
   AL.googleLink = (lat, lng) => `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
 
-  // ---------- ساخت vCard استاندارد ----------
-  AL.buildVCard = function (d) {
+  // ---------- ساخت vCard استاندارد (با پشتیبانی از عکس در مخاطبین) ----------
+  AL.buildVCard = function (d, includePhoto = true) {
     const phones = Array.isArray(d.phones) ? d.phones : (d.phone ? [d.phone] : []);
     let v = 'BEGIN:VCARD\r\nVERSION:3.0\r\n';
     v += 'N:' + AL.vEsc(d.name) + ';;;;\r\n';
@@ -213,29 +245,50 @@
       v += 'URL;TYPE=GoogleMaps:' + AL.googleLink(d.lat, d.lng) + '\r\n';
     }
 
+    // افزودن عکس به فایل مخاطب (.vcf)
+    if (includePhoto && d.photo) {
+      const cleanB64 = String(d.photo).replace(/^data:image\/\w+;base64,/, '').replace(/\s+/g, '');
+      if (cleanB64) {
+        v += 'PHOTO;ENCODING=b;TYPE=JPEG:' + cleanB64 + '\r\n';
+      }
+    }
+
     // پشتیبانی کامل استاندارد iOS و Android برای شبکه‌های اجتماعی
     if (d.instagram) {
-      v += 'X-SOCIALPROFILE;type=instagram:https://instagram.com/' + d.instagram + '\r\n';
-      v += 'URL;TYPE=Instagram:https://instagram.com/' + d.instagram + '\r\n';
+      const isUrl = /^https?:\/\//i.test(d.instagram);
+      const url = isUrl ? d.instagram : 'https://instagram.com/' + d.instagram;
+      v += 'X-SOCIALPROFILE;type=instagram:' + url + '\r\n';
+      v += 'URL;TYPE=Instagram:' + url + '\r\n';
     }
     if (d.telegram) {
-      v += 'X-SOCIALPROFILE;type=telegram:https://t.me/' + d.telegram + '\r\n';
-      v += 'URL;TYPE=Telegram:https://t.me/' + d.telegram + '\r\n';
+      const isUrl = /^https?:\/\//i.test(d.telegram);
+      const url = isUrl ? d.telegram : 'https://t.me/' + d.telegram;
+      v += 'X-SOCIALPROFILE;type=telegram:' + url + '\r\n';
+      v += 'URL;TYPE=Telegram:' + url + '\r\n';
     }
     if (d.eitaa) {
-      v += 'X-SOCIALPROFILE;type=eitaa:https://eitaa.com/' + d.eitaa + '\r\n';
-      v += 'URL;TYPE=Eitaa:https://eitaa.com/' + d.eitaa + '\r\n';
+      const isUrl = /^https?:\/\//i.test(d.eitaa);
+      const url = isUrl ? d.eitaa : 'https://eitaa.com/' + d.eitaa;
+      v += 'X-SOCIALPROFILE;type=eitaa:' + url + '\r\n';
+      v += 'URL;TYPE=Eitaa:' + url + '\r\n';
     }
     if (d.bale) {
-      v += 'X-SOCIALPROFILE;type=bale:https://ble.ir/' + d.bale + '\r\n';
-      v += 'URL;TYPE=Bale:https://ble.ir/' + d.bale + '\r\n';
+      const isUrl = /^https?:\/\//i.test(d.bale);
+      const url = isUrl ? d.bale : 'https://ble.ir/' + d.bale;
+      v += 'X-SOCIALPROFILE;type=bale:' + url + '\r\n';
+      v += 'URL;TYPE=Bale:' + url + '\r\n';
     }
     if (d.rubika) {
-      v += 'X-SOCIALPROFILE;type=rubika:https://rubika.ir/' + d.rubika + '\r\n';
-      v += 'URL;TYPE=Rubika:https://rubika.ir/' + d.rubika + '\r\n';
+      const isUrl = /^https?:\/\//i.test(d.rubika);
+      const url = isUrl ? d.rubika : 'https://rubika.ir/' + d.rubika;
+      v += 'X-SOCIALPROFILE;type=rubika:' + url + '\r\n';
+      v += 'URL;TYPE=Rubika:' + url + '\r\n';
     }
     if (d.whatsapp) {
-      v += 'URL;TYPE=WhatsApp:https://wa.me/' + d.whatsapp + '\r\n';
+      const isUrl = /^https?:\/\//i.test(d.whatsapp);
+      const num = AL.normDigits(d.whatsapp);
+      const url = isUrl ? d.whatsapp : ('https://wa.me/' + (num.startsWith('0') ? '98' + num.slice(1) : num));
+      v += 'URL;TYPE=WhatsApp:' + url + '\r\n';
     }
 
     if (d.category) v += 'CATEGORIES:' + AL.vEsc(d.category) + '\r\n';
@@ -249,7 +302,6 @@
     type: 'business',
     title: 'ساخت کیو آر کد | تولید محتوا | طراحی گرافیک | دکوراسیون داخلی',
     phones: ['09153136173', '09150086173', '09053660062'],
-    email: 'artminland78@gmail.com',
     whatsapp: '989153136173',
     instagram: 'artminland',
     telegram: 'artminland',
@@ -260,10 +312,10 @@
     description: 'بیست و پنج سال سابقه در حوزه طراحی، تبلیغات، تولید محتوا و ساخت کارت ویزیت دیجیتال'
   };
 
-  AL.CREATOR_VCARD = AL.buildVCard(AL.CREATOR_DATA);
+  AL.CREATOR_VCARD = AL.buildVCard(AL.CREATOR_DATA, false);
 
   // چند کارت در یک فایل .vcf (برای وارد کردن یکجا به مخاطبین)
-  AL.vcardsFile = list => list.map(AL.buildVCard).join('\r\n') + '\r\n';
+  AL.vcardsFile = list => list.map(c => AL.buildVCard(c, true)).join('\r\n') + '\r\n';
 
   // ---------- QR داخل مرورگر (بدون ارسال اطلاعات به سرور دیگر) ----------
   AL.qrCanvas = function (text, size) {
@@ -388,27 +440,5 @@
     return csv;
   };
 
-  // Public, self-contained card links. No database read permissions required.
-  AL.cardUrl = function (card) {
-    const fields = ['name','title','description','address','phones','type','instagram','telegram','whatsapp','eitaa','bale','rubika','email','website'];
-    const data = {};
-    fields.forEach(k => { if (card[k]) data[k] = card[k]; });
-    const bytes = new TextEncoder().encode(JSON.stringify(data));
-    const encoded = btoa(Array.from(bytes, b => String.fromCharCode(b)).join('')).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-    return new URL('card.html', location.href).href.split('#')[0] + '#v1.' + encoded;
-  };
-  AL.readCard = function (hash) {
-    if (!hash.startsWith('#v1.') || hash.length > 24000) throw new Error('Invalid card');
-    let raw = hash.slice(4).replace(/-/g, '+').replace(/_/g, '/');
-    raw += '='.repeat((4 - raw.length % 4) % 4);
-    const d = JSON.parse(new TextDecoder('utf-8', {fatal: true}).decode(Uint8Array.from(atob(raw), c => c.charCodeAt(0))));
-    if (!d || typeof d !== 'object' || typeof d.name !== 'string') throw new Error('Invalid card');
-    const out = {};
-    ['name','title','description','address','type'].forEach(k => { if (typeof d[k] === 'string') out[k] = d[k].slice(0, 4000); });
-    const normalizers = {instagram:AL.normInstagram, telegram:AL.normTelegram, whatsapp:AL.normWhatsapp, eitaa:AL.normEitaa, bale:AL.normBale, rubika:AL.normRubika, email:AL.normEmail, website:AL.normUrl};
-    Object.keys(normalizers).forEach(k => { if (typeof d[k] === 'string') out[k] = normalizers[k](d[k]); });
-    out.phones = Array.isArray(d.phones) ? d.phones.filter(v => typeof v === 'string').slice(0,20).map(AL.normDigits).filter(Boolean) : [];
-    return out;
-  };
   window.AL = AL;
 })();

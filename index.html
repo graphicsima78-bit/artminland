@@ -58,6 +58,7 @@ button:disabled { background: #999; cursor: default; }
 .qr-section { margin: 16px 0; padding: 14px; background: #f9f9f9; border-radius: 12px; }
 .qr-section h3 { color: #1b5e20; margin-bottom: 10px; font-size: 15px; }
 .qr-image { max-width: 220px; width: 100%; border: 8px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.15); border-radius: 10px; margin: 10px auto; display: block; background: white; image-rendering: pixelated; }
+.result-avatar { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; margin: 12px auto 6px; display: none; border: 3px solid #2e7d32; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
 .info-box { background: #e8f5e9; padding: 10px; border-radius: 8px; margin: 10px 0; text-align: start; border-inline-start: 4px solid #2e7d32; font-size: 13px; }
 .info-box p { margin: 5px 0; word-break: break-word; }
 .info-box strong { color: #1b5e20; }
@@ -289,6 +290,7 @@ button:disabled { background: #999; cursor: default; }
         <h3 data-i18n="qr1Title"></h3>
         <p style="font-size:12px;color:#666;" data-i18n="qr1Hint"></p>
         <img class="qr-image" id="qr-main" alt="Main QR">
+        <img id="result-photo" class="result-avatar" alt="Profile Photo">
         <div class="info-box" id="info-main"></div>
 
         <div class="actions">
@@ -484,7 +486,7 @@ const translations = {
     btnGenerate: '⚡ Generate QR Codes', resultTitle: '✅ QR Cards Ready!',
     mapTitle: '🌐 Map Registration', mapHint: 'One tap: copy the info and open the map app',
     btnGoogleMaps: '📍 Register on Google Maps', btnNeshan: '🗺️ Register on Neshan',
-    qr1Title: '📱 QR 1: Your Card', qr1Hint: 'Scan to open your public card and social links',
+    qr1Title: '📱 QR 1: Your Card', qr1Hint: 'Scan to save contact',
     qr2Title: '🛠️ QR 2: Artemin Land', qr2Hint: 'Creator of this card',
     btnDownload: '📥 Download QR', btnDownloadJson: '💾 Info (JSON)',
     btnContact: '👤 Add to contacts', btnShare: '📤 Share / Send',
@@ -547,7 +549,7 @@ const translations = {
     btnGenerate: '⚡ ساخت کیو آر کد', resultTitle: '✅ کیو آر کد آماده است!',
     mapTitle: '🌐 ثبت در نقشه', mapHint: 'یک لمس: اطلاعات کپی می‌شود و نقشه باز می‌شود',
     btnGoogleMaps: '📍 ثبت در گوگل مپ', btnNeshan: '🗺️ ثبت در نشان',
-    qr1Title: '📱 کیو آر ۱: کارت شما', qr1Hint: 'برای باز کردن کارت عمومی و شبکه‌های اجتماعی اسکن کنید',
+    qr1Title: '📱 کیو آر ۱: کارت شما', qr1Hint: 'برای ذخیره مخاطب اسکن کنید',
     qr2Title: '🛠️ کیو آر ۲: آرتمین لند', qr2Hint: 'سازنده این کارت',
     btnDownload: '📥 دانلود QR', btnDownloadJson: '💾 اطلاعات (JSON)',
     btnContact: '👤 افزودن به مخاطبین', btnShare: '📤 اشتراک / ارسال',
@@ -677,10 +679,26 @@ function handlePhotoUpload(event) {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = e => {
-    photoBase64 = e.target.result;
-    $('photo-preview').src = photoBase64;
-    $('photo-preview').style.display = 'block';
-    $('photo-hint').style.display = 'none';
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const maxDim = 200;
+      let w = img.width, h = img.height;
+      if (w > h) {
+        if (w > maxDim) { h = Math.round((h * maxDim) / w); w = maxDim; }
+      } else {
+        if (h > maxDim) { w = Math.round((w * maxDim) / h); h = maxDim; }
+      }
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      photoBase64 = canvas.toDataURL('image/jpeg', 0.85);
+      $('photo-preview').src = photoBase64;
+      $('photo-preview').style.display = 'block';
+      $('photo-hint').style.display = 'none';
+    };
+    img.src = e.target.result;
   };
   reader.readAsDataURL(file);
 }
@@ -830,7 +848,6 @@ function onScanSuccess(decodedText) {
       if (v.instagram) $('instagram').value = v.instagram;
       if (v.telegram) $('telegram').value = v.telegram;
       if (v.eitaa) $('eitaa').value = v.eitaa;
-      ['bale','rubika','whatsapp'].forEach(k => { if (v[k]) $(k).value = v[k]; });
       showStatus('✅ اطلاعات کارت ویزیت با موفقیت درج شد.', 'success');
     }
     return;
@@ -880,11 +897,6 @@ $('form').addEventListener('submit', function (e) {
   const email = AL.normEmail(emRaw);
   const website = AL.normUrl(weRaw);
 
-  if ((igRaw && !instagram) || (tgRaw && !telegram) || (eiRaw && !eitaa) || (baRaw && !bale) || (ruRaw && !rubika) || (waRaw && !whatsapp) || (emRaw && !email)) {
-    alert(t.invalidSocial);
-    return;
-  }
-
   const card = {
     name, phones,
     title: $('title-field').value.trim(),
@@ -896,6 +908,7 @@ $('form').addEventListener('submit', function (e) {
     registerNeshan: $('check-neshan').checked,
     hasPhoto: !!photoBase64
   };
+  if (photoBase64) card.photo = photoBase64;
   if (currentCoords) { card.lat = currentCoords.lat; card.lng = currentCoords.lng; }
   if (email) card.email = email;
   if (website) card.website = website;
@@ -909,13 +922,15 @@ $('form').addEventListener('submit', function (e) {
   lastFormData = card;
   cloudSaved = false;
 
-  try {
-    $('qr-main').src = AL.qrDataUrl(AL.cardUrl(card), 512);
-  } catch (err) {
-    alert('اطلاعات برای ساخت QR بیش از حد طولانی است. توضیحات یا آدرس را کوتاه‌تر کنید و دوباره کارت بسازید.');
-    return;
-  }
+  $('qr-main').src = AL.qrDataUrl(AL.buildVCard(card, false), 512);
   $('qr-creator').src = AL.qrDataUrl(AL.CREATOR_VCARD, 512);
+
+  if (card.photo) {
+    $('result-photo').src = card.photo;
+    $('result-photo').style.display = 'block';
+  } else {
+    $('result-photo').style.display = 'none';
+  }
 
   let info = `<p><strong>${t.name}:</strong> ${esc(name)}</p>`;
   info += `<p><strong>${t.type}:</strong> ${card.type === 'business' ? t.business : t.personal}</p>`;
@@ -933,13 +948,7 @@ $('form').addEventListener('submit', function (e) {
       info += `<p><strong>${s.label}:</strong> <a href="${esc(s.url)}" target="_blank" rel="noopener" dir="ltr">${esc(s.value)}</a></p>`;
     }
   });
-  const publicUrl = AL.cardUrl(card);
-  info += `<p><a href="${esc(publicUrl)}" target="_blank" rel="noopener">🌐 باز کردن صفحه عمومی کارت و شبکه‌های اجتماعی</a></p><p style="font-size:12px">این لینک عمومی است؛ اطلاعات حساس وارد نکنید. تغییر اطلاعات، لینک و QR تازه می‌سازد.</p>`;
   $('info-main').innerHTML = info;
-  const copyLink = document.createElement('button');
-  copyLink.type = 'button'; copyLink.textContent = '🔗 کپی لینک عمومی کارت';
-  copyLink.onclick = async () => { await copyText(publicUrl); copyLink.textContent = '✅ لینک کپی شد'; };
-  $('info-main').appendChild(copyLink);
 
   $('info-creator').innerHTML =
     `<p><strong>${t.name}:</strong> ${t.creatorName}</p>` +
@@ -977,6 +986,8 @@ function resetForm() {
   $('phones-container').innerHTML = '<div class="phone-row"><input type="tel" class="phone-input" inputmode="tel" placeholder="09153136173"></div>';
   $('photo-preview').style.display = 'none';
   $('photo-hint').style.display = 'block';
+  $('result-photo').style.display = 'none';
+  $('result-photo').src = '';
   photoBase64 = '';
   currentCoords = null;
   lastFormData = null;
@@ -1019,7 +1030,7 @@ function saveToPhone() {
 
 function addContact() {
   if (!lastFormData) return;
-  AL.downloadText('Contact-' + AL.safeName(lastFormData.name) + '.vcf', AL.buildVCard(lastFormData) + '\r\n', 'text/vcard;charset=utf-8');
+  AL.downloadText('Contact-' + AL.safeName(lastFormData.name) + '.vcf', AL.buildVCard(lastFormData, true) + '\r\n', 'text/vcard;charset=utf-8');
   showStatus(T().contactDone, 'success');
 }
 
@@ -1094,7 +1105,19 @@ function renderSaved() {
 
     group.forEach(c => {
       const item = mk('div', 'saved-item');
-      item.appendChild(mk('h4', '', c.name));
+      if (c.photo) {
+        const topRow = mk('div', '', '');
+        topRow.style.cssText = 'display:flex;align-items:center;gap:10px;margin-bottom:6px;';
+        const img = mk('img', '', '');
+        img.src = c.photo;
+        img.style.cssText = 'width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid #2e7d32;flex-shrink:0;';
+        const h4 = mk('h4', '', c.name);
+        h4.style.margin = '0';
+        topRow.append(img, h4);
+        item.appendChild(topRow);
+      } else {
+        item.appendChild(mk('h4', '', c.name));
+      }
       const ph = mk('p', 'ltr', (c.phones || []).join(' - '));
       item.appendChild(ph);
       if (c.title) item.appendChild(mk('p', '', c.title));
@@ -1116,7 +1139,7 @@ function renderSaved() {
       const row = mk('div', 'row');
       const btn = (label, cls, fn) => { const b = mk('button', cls, label); b.type = 'button'; b.addEventListener('click', fn); row.appendChild(b); return b; };
       btn(t.btnQr, 'btn-blue', () => showQrModal(c));
-      btn(t.btnVcf, 'btn-blue', () => AL.downloadText('Contact-' + AL.safeName(c.name) + '.vcf', AL.buildVCard(c) + '\r\n', 'text/vcard;charset=utf-8'));
+      btn(t.btnVcf, 'btn-blue', () => AL.downloadText('Contact-' + AL.safeName(c.name) + '.vcf', AL.buildVCard(c, true) + '\r\n', 'text/vcard;charset=utf-8'));
       const cb = btn(t.btnToCloud, 'btn-teal', async () => {
         cb.disabled = true;
         const ok = await sendToCloud(c);
@@ -1145,7 +1168,7 @@ function exportSaved(kind) {
 }
 
 function showQrModal(card) {
-  const url = AL.qrDataUrl(AL.cardUrl(card), 512);
+  const url = AL.qrDataUrl(AL.buildVCard(card, false), 512);
   $('qrModal-name').textContent = card.name;
   $('qrModal-img').src = url;
   $('qrModal-download').onclick = () => {

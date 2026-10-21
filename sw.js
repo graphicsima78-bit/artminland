@@ -1,9 +1,8 @@
 // Service Worker - نسخه ۴ با پشتیبانی کامل آفلاین از اسکنر و ساخت QR
-const CACHE_NAME = 'artemin-land-v5';
+const CACHE_NAME = 'artemin-land-v4';
 const ASSETS = [
   './',
   './index.html',
-  './card.html',
   './manifest.json',
   './common.js',
   './qrcode.min.js',
