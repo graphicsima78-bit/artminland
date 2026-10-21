@@ -1,10 +1,12 @@
-// هر بار که فایل‌های سایت را عوض کردی، شماره نسخه را بالا ببر (v3, v4, ...)
+// Service Worker - نسخه ۴ با پشتیبانی کامل آفلاین از اسکنر و ساخت QR
 const CACHE_NAME = 'artemin-land-v5';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './common.js',
+  './qrcode.min.js',
+  './html5-qrcode.min.js',
   './admin.html',
   './icon-192.png',
   './icon-512.png'
@@ -25,13 +27,13 @@ self.addEventListener('activate', event => {
   );
 });
 
-// اول از اینترنت می‌گیرد (همیشه آخرین نسخه)، اگر آفلاین بود از کش
+// استراتژی: اول از اینترنت، در صورت نبود اینترنت از حافظه کَش
 self.addEventListener('fetch', event => {
   const req = event.request;
   if (req.method !== 'GET') return;
 
   const url = new URL(req.url);
-  // درخواست‌های بیرونی (Firebase، QR، نقشه) را به مرورگر بسپار
+  // اجازه عبور درخواست‌های خارجی مانند Firebase و نقشه‌ها
   if (url.origin !== self.location.origin) return;
 
   event.respondWith(
