@@ -12,27 +12,28 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" href="icon-192.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Arial, sans-serif; background: #f0f2f5; padding: 16px; min-height: 100vh; padding-bottom: 80px; }
+body { font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, Tahoma, Arial, sans-serif; background: #f0f2f5; padding: 16px; min-height: 100vh; padding-bottom: 80px; }
 .container { max-width: 480px; margin: 0 auto; background: white; border-radius: 16px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 .logo { display: block; width: 84px; height: 84px; margin: 0 auto 8px; border-radius: 50%; }
 h1 { color: #1b5e20; text-align: center; margin-bottom: 16px; font-size: 22px; }
 .lang-switch { text-align: center; margin-bottom: 12px; }
-.lang-btn { width: auto; background: #1976d2; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 14px; margin: 0 4px; }
+.lang-btn { width: auto; background: #1976d2; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 14px; margin: 0 4px; font-family: inherit; }
 .lang-btn.active { background: #2e7d32; }
 .nav-tabs { display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 2px solid #ddd; padding-bottom: 8px; }
-.nav-tab { flex: 1; padding: 10px; background: #f5f5f5; color: #666; font-size: 13px; margin: 0; }
+.nav-tab { flex: 1; padding: 10px; background: #f5f5f5; color: #666; font-size: 13px; margin: 0; border: none; border-radius: 8px; cursor: pointer; font-family: inherit; }
 .nav-tab:hover { background: #e0e0e0; }
 .nav-tab.active { background: #2e7d32; color: white; }
 .tab-content { display: none; }
 .tab-content.active { display: block; }
 .form-group { margin-bottom: 14px; }
 label { display: block; margin-bottom: 6px; font-weight: bold; font-size: 14px; color: #333; }
-input, select, textarea { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; font-family: inherit; background: white; }
+input, select, textarea { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 15px; font-family: inherit; background: white; }
 input:focus, select:focus, textarea:focus { outline: none; border-color: #2e7d32; }
 textarea { resize: vertical; min-height: 60px; }
-button { width: 100%; padding: 14px; background: #2e7d32; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 8px; font-family: inherit; }
+button { width: 100%; padding: 14px; background: #2e7d32; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 8px; font-family: inherit; }
 button:hover { background: #1b5e20; }
 button:active { transform: scale(0.98); }
 button:disabled { background: #999; cursor: default; }
@@ -84,14 +85,14 @@ button:disabled { background: #999; cursor: default; }
 .status-msg.error { background: #ffebee; color: #c62828; }
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
 .modal-overlay.active { display: flex; }
-.modal-content { background: white; border-radius: 16px; padding: 24px; max-width: 480px; width: 100%; max-height: 90vh; overflow-y: auto; text-align: center; }
+.modal-content { background: white; border-radius: 16px; padding: 22px; max-width: 480px; width: 100%; max-height: 90vh; overflow-y: auto; text-align: center; position: relative; }
 .modal-content h3 { color: #1b5e20; margin-bottom: 12px; }
 .modal-guide { font-size: 12px; color: #555; background: #fff8e1; border-radius: 8px; padding: 10px; margin-bottom: 10px; text-align: start; line-height: 1.8; }
-.modal-field-row { display: flex; align-items: center; justify-content: space-between; background: #f5f5f5; padding: 12px 16px; border-radius: 8px; margin: 8px 0; border-inline-start: 4px solid #2e7d32; gap: 12px; min-height: 50px; text-align: start; }
-.modal-field-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.modal-field-row { display: flex; align-items: center; justify-content: space-between; background: #f5f5f5; padding: 10px 14px; border-radius: 8px; margin: 8px 0; border-inline-start: 4px solid #2e7d32; gap: 10px; min-height: 46px; text-align: start; }
+.modal-field-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
 .modal-field-label { font-size: 11px; color: #666; }
-.modal-field-value { font-size: 15px; font-weight: bold; color: #1b5e20; word-break: break-word; line-height: 1.4; }
-.btn-copy-field { background: #1976d2; width: auto; padding: 8px 14px; border-radius: 6px; font-size: 12px; white-space: nowrap; min-width: 75px; margin: 0; flex-shrink: 0; }
+.modal-field-value { font-size: 14px; font-weight: bold; color: #1b5e20; word-break: break-word; line-height: 1.4; }
+.btn-copy-field { background: #1976d2; width: auto; padding: 6px 12px; border-radius: 6px; font-size: 12px; white-space: nowrap; min-width: 70px; margin: 0; flex-shrink: 0; }
 .btn-copy-field.copied { background: #2e7d32; }
 .cat-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: #e8f5e9; color: #1b5e20; padding: 10px 12px; border-radius: 8px; margin: 16px 0 8px; font-weight: bold; font-size: 14px; }
 .cat-head button { width: auto; margin: 0; padding: 6px 10px; font-size: 12px; }
@@ -104,8 +105,27 @@ button:disabled { background: #999; cursor: default; }
 .empty-list { text-align: center; padding: 30px 10px; color: #999; font-size: 14px; }
 .install-banner { position: fixed; bottom: 0; left: 0; right: 0; background: #1b5e20; color: white; padding: 12px; text-align: center; font-size: 14px; display: none; z-index: 900; }
 .install-banner button { background: white; color: #1b5e20; width: auto; padding: 8px 20px; font-size: 14px; }
+
+/* استایل فیلدهای اسکن دوربین و شبکه‌های اجتماعی */
+.scan-banner-btn { background: linear-gradient(135deg, #1b5e20, #2e7d32); color: white; border: none; padding: 12px 14px; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px; width: 100%; box-shadow: 0 2px 6px rgba(46,125,50,0.25); }
+.scan-banner-btn:hover { background: linear-gradient(135deg, #0d3811, #1b5e20); }
+.social-input-row { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; }
+.social-input-row input { flex: 1; }
+.btn-field-scan { width: 44px; height: 44px; padding: 0; margin: 0; flex-shrink: 0; border-radius: 8px; background: #f0f2f5; border: 2px solid #ddd; color: #333; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.btn-field-scan:hover { background: #e8f5e9; border-color: #2e7d32; color: #1b5e20; }
+.flash-highlight { animation: flash-green 1.5s ease-out; }
+@keyframes flash-green { 0% { background: #c8e6c9; border-color: #2e7d32; } 100% { background: white; border-color: #ddd; } }
+
+/* استایل اسکنر */
+#scanner-container { width: 100%; max-width: 320px; margin: 0 auto; overflow: hidden; border-radius: 12px; border: 3px solid #2e7d32; background: #000; min-height: 250px; position: relative; }
+#reader { width: 100% !important; border: none !important; }
+#reader video { border-radius: 8px; width: 100% !important; object-fit: cover; }
+.scanner-actions { display: flex; gap: 8px; margin-top: 12px; }
+.scanner-actions button { margin: 0; font-size: 13px; padding: 10px; }
+.scanner-status { font-size: 13px; color: #555; margin-top: 8px; min-height: 20px; font-weight: bold; }
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script src="qrcode.min.js"></script>
+<script src="html5-qrcode.min.js"></script>
 <script src="common.js"></script>
 </head>
 <body>
@@ -173,11 +193,62 @@ button:disabled { background: #999; cursor: default; }
         <textarea id="description" rows="2" maxlength="500" data-i18n-ph="descriptionPlaceholder"></textarea>
       </div>
 
+      <!-- ایمیل و وب‌سایت -->
+      <div class="form-group">
+        <label for="email" data-i18n="labelEmail"></label>
+        <input type="email" id="email" maxlength="100" dir="ltr" autocomplete="off" data-i18n-ph="emailPlaceholder">
+      </div>
+      <div class="form-group">
+        <label for="website" data-i18n="labelWebsite"></label>
+        <input type="url" id="website" maxlength="200" dir="ltr" autocomplete="off" data-i18n-ph="websitePlaceholder">
+      </div>
+
+      <!-- شبکه‌های اجتماعی و پیام‌رسان‌ها به همراه اسکنر هوشمند دوربین -->
       <div class="form-group">
         <label data-i18n="labelSocial"></label>
-        <input type="text" id="instagram" maxlength="100" dir="ltr" autocomplete="off" data-i18n-ph="instagramPlaceholder" style="margin-bottom:8px">
-        <input type="tel" id="whatsapp" maxlength="30" dir="ltr" inputmode="tel" data-i18n-ph="whatsappPlaceholder" style="margin-bottom:8px">
-        <input type="text" id="telegram" maxlength="100" dir="ltr" autocomplete="off" data-i18n-ph="telegramPlaceholder">
+
+        <!-- دکمه اسکن هوشمند با دوربین/گالری -->
+        <button type="button" class="scan-banner-btn" onclick="startScanner(null)">
+          <span>📷</span>
+          <span data-i18n="btnSmartScan">اسکن هوشمند با دوربین یا عکس (شناسایی خودکار)</span>
+        </button>
+
+        <!-- اینستاگرام -->
+        <div class="social-input-row">
+          <input type="text" id="instagram" maxlength="100" dir="ltr" autocomplete="off" data-i18n-ph="instagramPlaceholder">
+          <button type="button" class="btn-field-scan" title="اسکن QR اینستاگرام" onclick="startScanner('instagram')">📷</button>
+        </div>
+
+        <!-- تلگرام -->
+        <div class="social-input-row">
+          <input type="text" id="telegram" maxlength="100" dir="ltr" autocomplete="off" data-i18n-ph="telegramPlaceholder">
+          <button type="button" class="btn-field-scan" title="اسکن QR تلگرام" onclick="startScanner('telegram')">📷</button>
+        </div>
+
+        <!-- ایتا (ایرانی) -->
+        <div class="social-input-row">
+          <input type="text" id="eitaa" maxlength="100" dir="ltr" autocomplete="off" data-i18n-ph="eitaaPlaceholder">
+          <button type="button" class="btn-field-scan" title="اسکن QR ایتا" onclick="startScanner('eitaa')">📷</button>
+        </div>
+
+        <!-- بله (ایرانی) -->
+        <div class="social-input-row">
+          <input type="text" id="bale" maxlength="100" dir="ltr" autocomplete="off" data-i18n-ph="balePlaceholder">
+          <button type="button" class="btn-field-scan" title="اسکن QR بله" onclick="startScanner('bale')">📷</button>
+        </div>
+
+        <!-- روبیکا (ایرانی) -->
+        <div class="social-input-row">
+          <input type="text" id="rubika" maxlength="100" dir="ltr" autocomplete="off" data-i18n-ph="rubikaPlaceholder">
+          <button type="button" class="btn-field-scan" title="اسکن QR روبیکا" onclick="startScanner('rubika')">📷</button>
+        </div>
+
+        <!-- واتساپ -->
+        <div class="social-input-row">
+          <input type="tel" id="whatsapp" maxlength="30" dir="ltr" inputmode="tel" data-i18n-ph="whatsappPlaceholder">
+          <button type="button" class="btn-field-scan" title="اسکن QR واتساپ" onclick="startScanner('whatsapp')">📷</button>
+        </div>
+
         <p class="hint" data-i18n="socialHint"></p>
       </div>
 
@@ -275,6 +346,33 @@ button:disabled { background: #999; cursor: default; }
   <button type="button" onclick="installApp()" data-i18n="installBtn"></button>
 </div>
 
+<!-- ================= مودال اسکنر دوربین و گالری ================= -->
+<div class="modal-overlay" id="scannerModal">
+  <div class="modal-content">
+    <h3 id="scannerModal-title">📷 اسکن با دوربین یا گالری</h3>
+    <p class="hint" style="margin-bottom:10px;">کد QR را مقابل دوربین بگیرید یا عکس آن را انتخاب کنید.</p>
+
+    <div id="scanner-container">
+      <div id="reader"></div>
+    </div>
+    <div class="scanner-status" id="scanner-status">آماده اسکن...</div>
+
+    <div class="scanner-actions">
+      <button type="button" class="btn-blue" onclick="document.getElementById('gallery-qr-input').click()">
+        🖼️ عکس از گالری
+      </button>
+      <input type="file" id="gallery-qr-input" accept="image/*" style="display:none;" onchange="handleGalleryQr(event)">
+      <button type="button" class="btn-gray" onclick="toggleCameraFacing()">
+        🔄 چرخش دوربین
+      </button>
+    </div>
+
+    <button type="button" class="btn-red" style="margin-top:10px;" onclick="closeScanner()">
+      ✖ بستن اسکنر
+    </button>
+  </div>
+</div>
+
 <!-- مودال QR -->
 <div class="modal-overlay" id="qrModal">
   <div class="modal-content">
@@ -298,7 +396,7 @@ button:disabled { background: #999; cursor: default; }
   </div>
 </div>
 
-<!-- Firebase: فقط ذخیره مشتری جدید (خواندن/ویرایش/حذف فقط در admin.html) -->
+<!-- Firebase: ذخیره در Firestore -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
   import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
@@ -324,8 +422,7 @@ button:disabled { background: #999; cursor: default; }
     } catch (e) {
       console.error("Error adding document:", e);
       if (e.code === 'permission-denied') {
-        // قوانین قدیمی فایربیس فیلدهای جدید را نمی‌پذیرند؛ بدون آن‌ها دوباره تلاش کن
-        const extra = ['lat', 'lng', 'instagram', 'whatsapp', 'telegram'];
+        const extra = ['lat', 'lng', 'email', 'website', 'instagram', 'whatsapp', 'telegram', 'eitaa', 'bale', 'rubika'];
         if (extra.some(k => k in data)) {
           const rest = { ...data };
           extra.forEach(k => delete rest[k]);
@@ -361,15 +458,23 @@ const CAT_KEYS = { 'فروشگاه': 'cat1', 'رستوران و کافه': 'cat2
 const translations = {
   en: {
     heading: '🟢 Artemin Land<br><small style="font-size:13px;color:#666;">QR Business Card Generator</small>',
-    labelSocial: 'Social media (optional)', instagramPlaceholder: '📸 Instagram: @username or link',
-    whatsappPlaceholder: '💬 WhatsApp: 09153136173 or +989153136173', telegramPlaceholder: '✈️ Telegram: @username or link',
-    socialHint: 'Numbers without a country code are treated as Iranian (+98).',
-    invalidSocial: 'Instagram, WhatsApp or Telegram value is not valid.',
-    savedPartial: '⚠️ Saved, but WITHOUT coordinates/social links. Update the Firebase rules (see README).',
+    labelSocial: 'Social media & messengers (optional)',
+    btnSmartScan: '📷 Smart Scan with Camera or Photo',
+    instagramPlaceholder: '📸 Instagram: @username or link',
+    telegramPlaceholder: '✈️ Telegram: @username or link',
+    eitaaPlaceholder: '🔸 Eitaa: @username or link',
+    balePlaceholder: '🔹 Bale: @username or link',
+    rubikaPlaceholder: '🔴 Rubika: @username or link',
+    whatsappPlaceholder: '💬 WhatsApp: 09153136173 or +989153136173',
+    socialHint: 'Tap 📷 to scan QR codes with camera or pick screenshot from gallery.',
+    invalidSocial: 'One or more social media / messenger fields are invalid.',
+    savedPartial: '⚠️ Saved, but without new fields. Update the Firebase rules (see README).',
     tabForm: '📝 Form', tabSaved: '📱 Saved on phone',
     labelType: 'Card Type', typeBusiness: '🏪 Business', typePersonal: '👤 Personal',
     labelName: 'Name', labelPhone: 'Phone Number', btnAddPhone: '➕ Add More Phone',
     labelCategory: 'Job Category (folder)', labelTitle: 'Job Title', labelDescription: 'Additional Description',
+    labelEmail: 'Email (Optional)', emailPlaceholder: 'e.g. info@example.com',
+    labelWebsite: 'Website (Optional)', websitePlaceholder: 'e.g. https://mywebsite.com',
     catChoose: 'Choose...', cat1: '🏪 Shop', cat2: '🍽️ Restaurant & Cafe', cat3: '⚕️ Medical & Health', cat4: '🔧 Engineering',
     cat5: '⚖️ Legal', cat6: '📚 Education', cat7: '🎨 Art', cat8: '🛠️ Technical Services', cat9: '📌 Other',
     labelAddress: 'Full Address', btnLocation: 'Use My Current Location (GPS)',
@@ -392,6 +497,7 @@ const translations = {
     namePlaceholderBusiness: 'Business name', namePlaceholderPersonal: 'Full name',
     alertFill: 'Please fill Name and Phone!',
     name: 'Name', phone: 'Phone', title: 'Title', address: 'Address', category: 'Category', description: 'Description', type: 'Type', coords: 'Coordinates',
+    email: 'Email', website: 'Website',
     creatorName: 'Artemin Land', creatorTitle: 'QR Code Creation | Content Creation | Graphic Design | Interior Decoration',
     creatorPhones: '09153136173 - 09150086173', creatorAddress: 'Mashhad, Iran',
     noQR: 'No QR!', business: 'Business', personal: 'Personal',
@@ -415,15 +521,23 @@ const translations = {
   },
   fa: {
     heading: '🟢 آرتمین لند<br><small style="font-size:13px;color:#666;">ساخت کارت ویزیت دیجیتال (QR)</small>',
-    labelSocial: 'شبکه‌های اجتماعی (اختیاری)', instagramPlaceholder: '📸 اینستاگرام: @نام‌کاربری یا لینک',
-    whatsappPlaceholder: '💬 واتساپ: 09153136173 یا +989153136173', telegramPlaceholder: '✈️ تلگرام: @نام‌کاربری یا لینک',
-    socialHint: 'شماره بدون پیش‌شماره کشور، ایرانی (+98) حساب می‌شود. نام‌کاربری یا لینک کامل هر دو قبول است.',
-    invalidSocial: 'اینستاگرام، واتساپ یا تلگرام معتبر نیست.',
-    savedPartial: '⚠️ ذخیره شد، ولی بدون مختصات و شبکه‌های اجتماعی. قوانین فایربیس را به‌روز کن (README).',
+    labelSocial: 'شبکه‌های اجتماعی و پیام‌رسان‌ها (اختیاری)',
+    btnSmartScan: '📷 اسکن هوشمند با دوربین یا عکس (شناسایی خودکار)',
+    instagramPlaceholder: '📸 اینستاگرام: @نام‌کاربری یا لینک',
+    telegramPlaceholder: '✈️ تلگرام: @نام‌کاربری یا لینک',
+    eitaaPlaceholder: '🔸 ایتا: @نام‌کاربری یا لینک',
+    balePlaceholder: '🔹 بله: @نام‌کاربری یا لینک',
+    rubikaPlaceholder: '🔴 روبیکا: @نام‌کاربری یا لینک',
+    whatsappPlaceholder: '💬 واتساپ: 09153136173 یا +989153136173',
+    socialHint: 'با زدن دکمه 📷 می‌توانید کد QR پروفایل را با دوربین یا اسکرین‌شات گالری اسکن کنید.',
+    invalidSocial: 'یکی از فیلدهای شبکه‌های اجتماعی معتبر نیست.',
+    savedPartial: '⚠️ ذخیره شد، ولی بدون فیلدهای جدید. قوانین فایربیس را به‌روز کنید (README).',
     tabForm: '📝 فرم', tabSaved: '📱 ذخیره‌شده در گوشی',
     labelType: 'نوع کارت', typeBusiness: '🏪 کسب‌وکار', typePersonal: '👤 شخصی',
     labelName: 'نام', labelPhone: 'شماره تماس', btnAddPhone: '➕ افزودن شماره بیشتر',
     labelCategory: 'سرفصل شغلی (دسته‌بندی)', labelTitle: 'عنوان شغلی', labelDescription: 'توضیحات تکمیلی',
+    labelEmail: 'ایمیل (اختیاری)', emailPlaceholder: 'مثال: info@example.com',
+    labelWebsite: 'وب‌سایت (اختیاری)', websitePlaceholder: 'مثال: https://mysite.com',
     catChoose: 'انتخاب کنید...', cat1: '🏪 فروشگاه', cat2: '🍽️ رستوران و کافه', cat3: '⚕️ پزشکی و سلامت', cat4: '🔧 مهندسی',
     cat5: '⚖️ حقوقی', cat6: '📚 آموزش', cat7: '🎨 هنری', cat8: '🛠️ خدمات فنی', cat9: '📌 سایر',
     labelAddress: 'آدرس کامل', btnLocation: 'استفاده از موقعیت فعلی من (GPS)',
@@ -446,6 +560,7 @@ const translations = {
     namePlaceholderBusiness: 'نام کسب‌وکار', namePlaceholderPersonal: 'نام و نام خانوادگی',
     alertFill: 'لطفاً نام و تلفن را وارد کنید!',
     name: 'نام', phone: 'تلفن', title: 'عنوان', address: 'آدرس', category: 'دسته‌بندی', description: 'توضیحات', type: 'نوع', coords: 'مختصات',
+    email: 'ایمیل', website: 'وب‌سایت',
     creatorName: 'آرتمین لند', creatorTitle: 'ساخت کیو آر کد برای هر صنفی | تولید محتوا | طراحی گرافیک | دکوراسیون داخلی',
     creatorPhones: '۰۹۱۵۳۱۳۶۱۷۳ - ۰۹۱۵۰۰۸۶۱۷۳', creatorAddress: 'مشهد، ایران',
     noQR: 'کیو آر کدی وجود ندارد!', business: 'کسب‌وکار', personal: 'شخصی',
@@ -500,9 +615,9 @@ async function copyText(text) {
     document.body.removeChild(ta);
   }
 }
-// فقط فیلدهایی که قوانین فایربیس اجازه می‌دهد
+
 function cloudPayload(c) {
-  const keys = ['name', 'phones', 'title', 'description', 'address', 'category', 'type', 'registerGoogle', 'registerNeshan', 'hasPhoto', 'lat', 'lng', 'instagram', 'whatsapp', 'telegram'];
+  const keys = ['name', 'phones', 'title', 'description', 'address', 'category', 'type', 'registerGoogle', 'registerNeshan', 'hasPhoto', 'lat', 'lng', 'email', 'website', 'instagram', 'whatsapp', 'telegram', 'eitaa', 'bale', 'rubika'];
   const out = {};
   keys.forEach(k => { if (c[k] !== undefined && c[k] !== null) out[k] = c[k]; });
   return out;
@@ -550,10 +665,10 @@ function setType(type) {
 }
 
 // ---------- شماره‌ها و عکس ----------
-function addPhoneField() {
+function addPhoneField(val = '') {
   const row = document.createElement('div');
   row.className = 'phone-row';
-  row.innerHTML = '<input type="tel" class="phone-input" inputmode="tel" placeholder="09153136173"><button type="button" class="btn-remove-phone">❌</button>';
+  row.innerHTML = `<input type="tel" class="phone-input" inputmode="tel" placeholder="09153136173" value="${esc(val)}"><button type="button" class="btn-remove-phone">❌</button>`;
   row.querySelector('button').addEventListener('click', () => row.remove());
   $('phones-container').appendChild(row);
 }
@@ -586,13 +701,13 @@ async function getLocation() {
     const position = await new Promise((resolve, reject) =>
       navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }));
     const lat = +position.coords.latitude.toFixed(6), lng = +position.coords.longitude.toFixed(6);
-    currentCoords = { lat, lng };          // مختصات همین‌جا ذخیره می‌شود حتی اگر نام خیابان پیدا نشود
+    currentCoords = { lat, lng };
     btn.textContent = t.detectingAddress;
     try {
       const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=fa,en`);
       const data = await response.json();
       if (data && data.display_name) $('address').value = data.display_name;
-    } catch (e) { /* آدرس متنی دستی وارد شود، مختصات ثبت شده است */ }
+    } catch (e) { }
     successMsg.textContent = t.locationSuccess;
     successMsg.style.display = 'block';
     setTimeout(() => { successMsg.style.display = 'none'; }, 4000);
@@ -610,8 +725,133 @@ async function getLocation() {
   }
   resetBtn();
 }
-// اگر آدرس را دستی عوض کرد، مختصات قبلی دیگر معتبر نیست
 $('address').addEventListener('input', () => { currentCoords = null; });
+
+// ================= اسکنر دوربین و عکس از گالری =================
+let html5QrScanner = null;
+let currentFacingMode = "environment";
+let activeTargetField = null;
+
+async function startScanner(targetField = null) {
+  activeTargetField = targetField;
+  $('scannerModal').classList.add('active');
+  $('scanner-status').textContent = 'در حال راه‌اندازی دوربین...';
+
+  const titleMap = {
+    instagram: '📷 اسکن اینستاگرام',
+    telegram: '📷 اسکن تلگرام',
+    eitaa: '📷 اسکن ایتا',
+    bale: '📷 اسکن بله',
+    rubika: '📷 اسکن روبیکا',
+    whatsapp: '📷 اسکن واتساپ'
+  };
+  $('scannerModal-title').textContent = (targetField && titleMap[targetField]) || '📷 اسکن با دوربین یا گالری';
+
+  try {
+    if (!html5QrScanner) {
+      html5QrScanner = new Html5Qrcode("reader");
+    }
+    await html5QrScanner.start(
+      { facingMode: currentFacingMode },
+      { fps: 10, qrbox: { width: 250, height: 250 } },
+      onScanSuccess,
+      () => {}
+    );
+    $('scanner-status').textContent = 'کد را جلوی کادر نگه دارید';
+  } catch (err) {
+    console.warn("Camera start err:", err);
+    $('scanner-status').textContent = 'دوربین در دسترس نیست. می‌توانید از دکمه «عکس از گالری» استفاده کنید.';
+  }
+}
+
+async function closeScanner() {
+  if (html5QrScanner) {
+    try {
+      if (html5QrScanner.isScanning) await html5QrScanner.stop();
+    } catch (e) {}
+  }
+  $('scannerModal').classList.remove('active');
+  activeTargetField = null;
+}
+
+async function toggleCameraFacing() {
+  currentFacingMode = currentFacingMode === "environment" ? "user" : "environment";
+  if (html5QrScanner && html5QrScanner.isScanning) {
+    await html5QrScanner.stop();
+    await html5QrScanner.start(
+      { facingMode: currentFacingMode },
+      { fps: 10, qrbox: { width: 250, height: 250 } },
+      onScanSuccess,
+      () => {}
+    );
+  }
+}
+
+async function handleGalleryQr(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  $('scanner-status').textContent = 'در حال خواندن عکس...';
+  try {
+    const scanner = html5QrScanner || new Html5Qrcode("reader");
+    const decoded = await scanner.scanFile(file, true);
+    onScanSuccess(decoded);
+  } catch (err) {
+    alert('کیو‌آر کدی در این تصویر تشخیص داده نشد. لطفاً عکسی واضح‌تر انتخاب کنید.');
+    $('scanner-status').textContent = 'کدی یافت نشد. دوباره تلاش کنید.';
+  }
+  event.target.value = '';
+}
+
+function onScanSuccess(decodedText) {
+  AL.playBeep();
+  closeScanner();
+
+  const parsed = AL.parseScanned(decodedText);
+  if (!parsed) {
+    alert('متن اسکن‌شده:\n' + decodedText);
+    return;
+  }
+
+  // 1. اگر کارت ویزیت کامل (vCard) بود
+  if (parsed.type === 'vcard') {
+    const v = parsed.parsed;
+    if (confirm('کارت ویزیت شناسایی شد!\nآیا مایلید فیلدهای فرم (نام، شماره، آدرس و...) به طور خودکار پر شوند؟')) {
+      if (v.name) $('name').value = v.name;
+      if (v.phones && v.phones.length) {
+        const pInputs = document.querySelectorAll('.phone-input');
+        if (pInputs.length) pInputs[0].value = v.phones[0];
+        for (let i = 1; i < v.phones.length; i++) addPhoneField(v.phones[i]);
+      }
+      if (v.title) $('title-field').value = v.title;
+      if (v.description) $('description').value = v.description;
+      if (v.address) $('address').value = v.address;
+      if (v.email) $('email').value = v.email;
+      if (v.website) $('website').value = v.website;
+      if (v.instagram) $('instagram').value = v.instagram;
+      if (v.telegram) $('telegram').value = v.telegram;
+      if (v.eitaa) $('eitaa').value = v.eitaa;
+      showStatus('✅ اطلاعات کارت ویزیت با موفقیت درج شد.', 'success');
+    }
+    return;
+  }
+
+  // 2. فیلد مشخص یا خودکار
+  const fieldKey = activeTargetField || (['instagram', 'telegram', 'eitaa', 'bale', 'rubika', 'whatsapp', 'email', 'website'].includes(parsed.type) ? parsed.type : null);
+
+  if (fieldKey && $(fieldKey)) {
+    $(fieldKey).value = parsed.value;
+    $(fieldKey).classList.add('flash-highlight');
+    setTimeout(() => $(fieldKey).classList.remove('flash-highlight'), 1800);
+    showStatus(`✅ ${parsed.label || fieldKey} ثبت شد: ${parsed.value}`, 'success');
+  } else if (parsed.type === 'phone') {
+    const pInputs = document.querySelectorAll('.phone-input');
+    if (pInputs.length && !pInputs[0].value) pInputs[0].value = parsed.value;
+    else addPhoneField(parsed.value);
+    showStatus(`✅ شماره تماس ثبت شد: ${parsed.value}`, 'success');
+  } else {
+    alert(`نتیجه اسکن:\n${parsed.value}`);
+  }
+}
 
 // ---------- ساخت کارت ----------
 $('form').addEventListener('submit', function (e) {
@@ -621,9 +861,28 @@ $('form').addEventListener('submit', function (e) {
   const phones = [...document.querySelectorAll('.phone-input')].map(i => AL.normDigits(i.value)).filter(Boolean);
   if (!name || phones.length === 0) { alert(t.alertFill); return; }
 
-  const igRaw = $('instagram').value.trim(), waRaw = $('whatsapp').value.trim(), tgRaw = $('telegram').value.trim();
-  const instagram = AL.normInstagram(igRaw), whatsapp = AL.normWhatsapp(waRaw), telegram = AL.normTelegram(tgRaw);
-  if ((igRaw && !instagram) || (waRaw && !whatsapp) || (tgRaw && !telegram)) { alert(t.invalidSocial); return; }
+  const igRaw = $('instagram').value.trim();
+  const tgRaw = $('telegram').value.trim();
+  const eiRaw = $('eitaa').value.trim();
+  const baRaw = $('bale').value.trim();
+  const ruRaw = $('rubika').value.trim();
+  const waRaw = $('whatsapp').value.trim();
+  const emRaw = $('email').value.trim();
+  const weRaw = $('website').value.trim();
+
+  const instagram = AL.normInstagram(igRaw);
+  const telegram = AL.normTelegram(tgRaw);
+  const eitaa = AL.normEitaa(eiRaw);
+  const bale = AL.normBale(baRaw);
+  const rubika = AL.normRubika(ruRaw);
+  const whatsapp = AL.normWhatsapp(waRaw);
+  const email = AL.normEmail(emRaw);
+  const website = AL.normUrl(weRaw);
+
+  if ((igRaw && !instagram) || (tgRaw && !telegram) || (eiRaw && !eitaa) || (baRaw && !bale) || (ruRaw && !rubika) || (waRaw && !whatsapp) || (emRaw && !email)) {
+    alert(t.invalidSocial);
+    return;
+  }
 
   const card = {
     name, phones,
@@ -637,9 +896,15 @@ $('form').addEventListener('submit', function (e) {
     hasPhoto: !!photoBase64
   };
   if (currentCoords) { card.lat = currentCoords.lat; card.lng = currentCoords.lng; }
+  if (email) card.email = email;
+  if (website) card.website = website;
   if (instagram) card.instagram = instagram;
-  if (whatsapp) card.whatsapp = whatsapp;
   if (telegram) card.telegram = telegram;
+  if (eitaa) card.eitaa = eitaa;
+  if (bale) card.bale = bale;
+  if (rubika) card.rubika = rubika;
+  if (whatsapp) card.whatsapp = whatsapp;
+
   lastFormData = card;
   cloudSaved = false;
 
@@ -653,8 +918,15 @@ $('form').addEventListener('submit', function (e) {
   if (card.title) info += `<p><strong>${t.title}:</strong> ${esc(card.title)}</p>`;
   if (card.description) info += `<p><strong>${t.description}:</strong> ${esc(card.description)}</p>`;
   if (card.address) info += `<p><strong>${t.address}:</strong> ${esc(card.address)}</p>`;
+  if (card.email) info += `<p><strong>${t.email}:</strong> <span dir="ltr">${esc(card.email)}</span></p>`;
+  if (card.website) info += `<p><strong>${t.website}:</strong> <a href="${esc(card.website)}" target="_blank" rel="noopener" dir="ltr">${esc(card.website)}</a></p>`;
   if (AL.hasCoords(card)) info += `<p><strong>${t.coords}:</strong> <span dir="ltr">${card.lat}, ${card.lng}</span></p>`;
-  AL.socialLinks(card).forEach(s => { info += `<p><strong>${s.label}:</strong> <a href="${esc(s.url)}" target="_blank" rel="noopener" dir="ltr">${esc(s.value)}</a></p>`; });
+
+  AL.socialLinks(card).forEach(s => {
+    if (s.key !== 'email' && s.key !== 'website') {
+      info += `<p><strong>${s.label}:</strong> <a href="${esc(s.url)}" target="_blank" rel="noopener" dir="ltr">${esc(s.value)}</a></p>`;
+    }
+  });
   $('info-main').innerHTML = info;
 
   $('info-creator').innerHTML =
@@ -734,7 +1006,7 @@ function addContact() {
 async function shareCard() {
   if (!lastFormData) return;
   const c = lastFormData;
-  const text = [c.name, c.title, (c.phones || []).join(' - '), c.address, AL.hasCoords(c) ? AL.googleLink(c.lat, c.lng) : '', ...AL.socialLinks(c).map(s => s.url)]
+  const text = [c.name, c.title, (c.phones || []).join(' - '), c.email, c.website, c.address, AL.hasCoords(c) ? AL.googleLink(c.lat, c.lng) : '', ...AL.socialLinks(c).map(s => s.url)]
     .filter(Boolean).join('\n');
   try {
     const blob = await (await fetch($('qr-main').src)).blob();
@@ -807,6 +1079,8 @@ function renderSaved() {
       item.appendChild(ph);
       if (c.title) item.appendChild(mk('p', '', c.title));
       if (c.address) item.appendChild(mk('p', '', c.address));
+      if (c.email) item.appendChild(mk('p', 'ltr', c.email));
+      if (c.website) item.appendChild(mk('p', 'ltr', c.website));
       const soc = AL.socialLinks(c);
       if (soc.length) {
         const sp = mk('p', 'ltr');
@@ -921,7 +1195,7 @@ async function copyAllInfo() {
   alert(T().allInfoCopied);
 }
 
-// دکمه‌های باز کردن نقشه: اطلاعات را خودکار کپی می‌کنند و نقشه را روی نقطه دقیق باز می‌کنند
+// دکمه‌های باز کردن نقشه با مختصات دقیق
 async function openGoogleMaps() {
   const c = lastFormData || {};
   await copyText(allInfoText());
@@ -941,8 +1215,12 @@ async function openGoogleMaps() {
 async function openNeshan() {
   const c = lastFormData || {};
   await copyText(allInfoText());
-  const q = encodeURIComponent(((c.name || '') + ' ' + (c.address || '')).trim());
-  window.open(`https://nshn.ir/?q=${q}`, '_blank');
+  if (AL.hasCoords(c)) {
+    window.open(`https://neshan.org/maps/@${c.lat},${c.lng},16z`, '_blank');
+  } else {
+    const q = encodeURIComponent(((c.name || '') + ' ' + (c.address || '')).trim());
+    window.open(`https://nshn.ir/?q=${q}`, '_blank');
+  }
   closeModal();
 }
 
