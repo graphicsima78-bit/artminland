@@ -369,6 +369,7 @@ button:disabled { background: #999; cursor: default; }
         <div class="actions">
           <button type="button" class="full btn-teal" id="btn-save-cloud" onclick="saveCloud()"></button>
           <button type="button" class="full btn-purple" id="btn-save-phone" onclick="saveToPhone()"></button>
+          <button type="button" onclick="saveToPhone(true)">ساخت و ذخیره یک کپی جداگانه</button>
           <button type="button" class="btn-blue btn-small" onclick="addContact()" data-i18n="btnContact"></button>
           <button type="button" class="btn-blue btn-small" onclick="downloadQR('qr-main', 'Main')" data-i18n="btnDownload"></button>
           <button type="button" class="btn-blue btn-small" onclick="shareCard()" data-i18n="btnShare"></button>
@@ -405,6 +406,8 @@ button:disabled { background: #999; cursor: default; }
     <div class="actions">
       <button type="button" class="btn-blue btn-small" onclick="exportSaved('vcf')" data-i18n="exportVcf"></button>
       <button type="button" class="btn-blue btn-small" onclick="exportSaved('csv')" data-i18n="exportCsv"></button>
+      <button type="button" onclick="document.getElementById('restore-backup').click()">بازیابی بک‌آپ JSON — ادغام بدون تکرار</button>
+      <input id="restore-backup" type="file" accept=".json,application/json" hidden onchange="restoreBackup(event)">
       <button type="button" class="btn-blue btn-small full" onclick="exportSaved('json')" data-i18n="exportJson"></button>
     </div>
     <div id="saved-list"></div>
@@ -1152,21 +1155,50 @@ async function saveCloud() {
   if (!ok) $('btn-save-cloud').disabled = false;
 }
 
+function localCardKey(c) {
+  const name = String(c.name || '').trim().replace(/ي/g,'ی').replace(/ك/g,'ک').replace(/\s+/g,' ').toLowerCase();
+  const phone = AL.normWhatsapp((c.phones || [c.phone || ''])[0]) || AL.normDigits((c.phones || [c.phone || ''])[0]);
+  return name + '|' + phone;
+}
+async function restoreBackup(event) {
+  const file = event.target.files[0]; if (!file) return;
+  try {
+    const parsed = JSON.parse(await file.text());
+    const incoming = Array.isArray(parsed) ? parsed : (Array.isArray(parsed.cards) ? parsed.cards : (parsed.name ? [parsed] : null));
+    if (!incoming || incoming.length > 10000) throw new Error('invalid');
+    if (!confirm('بک‌آپ با کارت‌های همین گوشی ادغام شود؟ موارد جدید اضافه و موارد موجود فقط در صورت جدیدتر بودن به‌روزرسانی می‌شوند.')) return;
+    const list = loadLocal(); let added=0, updated=0, skipped=0;
+    for (const raw of incoming) {
+      if (!raw || typeof raw.name !== 'string' || (!Array.isArray(raw.phones) && !raw.phone)) throw new Error('invalid');
+      const c = JSON.parse(JSON.stringify(raw)); delete c._phoneSaved;
+      const i = list.findIndex(old => (c.id && old.id === c.id) || ((!c.id || !old.id) && localCardKey(old) === localCardKey(c)));
+      if (i < 0) { list.push({...c,id:c.id || crypto.randomUUID()}); added++; }
+      else if ((Date.parse(c.savedAt || c.updatedAt || '') || 0) > (Date.parse(list[i].savedAt || list[i].updatedAt || '') || 0)) {
+        list[i] = {...list[i],...c,id:list[i].id || c.id || crypto.randomUUID()}; updated++;
+      } else skipped++;
+    }
+    if (!storeLocal(list)) throw new Error('storage');
+    renderSaved(); alert('✅ بازیابی انجام شد\nجدید: '+added+'\nبه‌روزرسانی: '+updated+'\nبدون تغییر: '+skipped);
+  } catch(e) { alert('بازیابی انجام نشد؛ فایل باید بک‌آپ JSON معتبر برنامه باشد و حافظه گوشی فضای کافی داشته باشد. اطلاعات قبلی حذف نشد.'); }
+  finally { event.target.value = ''; }
+}
 function loadLocal() {
   try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); } catch (e) { return []; }
 }
 function storeLocal(list) {
   try { localStorage.setItem(LS_KEY, JSON.stringify(list)); return true; } catch (e) { return false; }
 }
-function saveToPhone() {
+function saveToPhone(makeCopy = false) {
   if (!lastFormData) return;
   const list = loadLocal();
   const { _phoneSaved, ...card } = lastFormData;
-  const same = list.findIndex(c => c.name === card.name && (c.phones || [])[0] === card.phones[0]);
-  const item = { id: same >= 0 ? list[same].id : Date.now().toString(36), ...card, savedAt: new Date().toISOString() };
+  if (makeCopy && !confirm('یک نسخه جداگانه از این کارت ساخته شود؟')) return;
+  const same = makeCopy ? -1 : list.findIndex(c => (card.id && c.id === card.id) || (!card.id && localCardKey(c) === localCardKey(card)));
+  if (makeCopy) delete card.id;
+  const item = { ...card, id: same >= 0 ? list[same].id : (card.id || crypto.randomUUID()), savedAt: new Date().toISOString() };
   if (same >= 0) list[same] = item; else list.unshift(item);
   const ok = storeLocal(list);
-  if (ok) lastFormData._phoneSaved = true;
+  if (ok) { lastFormData._phoneSaved = true; lastFormData.id = item.id; renderSaved(); alert(same >= 0 ? '✅ کارت موجود در این گوشی به‌روزرسانی شد؛ نسخه تکراری ساخته نشد.' : '✅ کارت با موفقیت در همین گوشی ذخیره شد.'); }
   showStatus(ok ? T().savedPhoneMsg : T().saveCloudFailed, ok ? 'success' : 'error');
   refreshActionButtons();
 }
