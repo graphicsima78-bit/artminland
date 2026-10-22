@@ -58,7 +58,6 @@ button:disabled { background: #999; cursor: default; }
 .qr-section { margin: 16px 0; padding: 14px; background: #f9f9f9; border-radius: 12px; }
 .qr-section h3 { color: #1b5e20; margin-bottom: 10px; font-size: 15px; }
 .qr-image { max-width: 220px; width: 100%; border: 8px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.15); border-radius: 10px; margin: 10px auto; display: block; background: white; image-rendering: pixelated; }
-.result-avatar { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; margin: 12px auto 6px; display: none; border: 3px solid #2e7d32; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
 .info-box { background: #e8f5e9; padding: 10px; border-radius: 8px; margin: 10px 0; text-align: start; border-inline-start: 4px solid #2e7d32; font-size: 13px; }
 .info-box p { margin: 5px 0; word-break: break-word; }
 .info-box strong { color: #1b5e20; }
@@ -101,8 +100,8 @@ button:disabled { background: #999; cursor: default; }
 .saved-item h4 { color: #1b5e20; font-size: 14px; margin-bottom: 4px; }
 .saved-item p { font-size: 12px; color: #666; margin: 2px 0; word-break: break-word; }
 .saved-item .ltr { direction: ltr; text-align: start; }
-.saved-item .row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-top: 8px; }
-.saved-item .row button { margin: 0; padding: 7px 2px; font-size: 11px; }
+.saved-item .row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 8px; }
+.saved-item .row button { margin: 0; padding: 8px 4px; font-size: 12px; }
 .empty-list { text-align: center; padding: 30px 10px; color: #999; font-size: 14px; }
 .install-banner { position: fixed; bottom: 0; left: 0; right: 0; background: #1b5e20; color: white; padding: 12px; text-align: center; font-size: 14px; display: none; z-index: 900; }
 .install-banner button { background: white; color: #1b5e20; width: auto; padding: 8px 20px; font-size: 14px; }
@@ -156,13 +155,8 @@ button:disabled { background: #999; cursor: default; }
       </div>
 
       <div class="form-group">
-        <label class="required" for="name" id="label-name" data-i18n="labelName"></label>
+        <label class="required" for="name" data-i18n="labelName"></label>
         <input type="text" id="name" maxlength="120" autocomplete="off">
-      </div>
-
-      <div class="form-group" id="manager-group">
-        <label for="manager" data-i18n="labelManager"></label>
-        <input type="text" id="manager" maxlength="120" autocomplete="off" data-i18n-ph="managerPlaceholder">
       </div>
 
       <div class="form-group">
@@ -185,13 +179,69 @@ button:disabled { background: #999; cursor: default; }
           <option value="آموزش" data-i18n="cat6"></option>
           <option value="هنری" data-i18n="cat7"></option>
           <option value="خدمات فنی" data-i18n="cat8"></option>
+          <option value="فناوری اطلاعات و نرم‌افزار">فناوری اطلاعات و نرم‌افزار</option>
+          <option value="هوش مصنوعی و داده">هوش مصنوعی و داده</option>
+          <option value="طراحی وب و اپلیکیشن">طراحی وب و اپلیکیشن</option>
+          <option value="شبکه و امنیت">شبکه و امنیت</option>
+          <option value="فروش و بازاریابی">فروش و بازاریابی</option>
+          <option value="تبلیغات و روابط عمومی">تبلیغات و روابط عمومی</option>
+          <option value="تولید محتوا و رسانه">تولید محتوا و رسانه</option>
+          <option value="چاپ و بسته‌بندی">چاپ و بسته‌بندی</option>
+          <option value="گرافیک و طراحی">گرافیک و طراحی</option>
+          <option value="عکاسی و فیلم‌برداری">عکاسی و فیلم‌برداری</option>
+          <option value="موسیقی و هنرهای نمایشی">موسیقی و هنرهای نمایشی</option>
+          <option value="صنایع دستی">صنایع دستی</option>
+          <option value="معماری و دکوراسیون">معماری و دکوراسیون</option>
+          <option value="ساختمان و عمران">ساختمان و عمران</option>
+          <option value="املاک و مستغلات">املاک و مستغلات</option>
+          <option value="صنعت و تولید">صنعت و تولید</option>
+          <option value="معدن و متالورژی">معدن و متالورژی</option>
+          <option value="نفت، گاز و پتروشیمی">نفت، گاز و پتروشیمی</option>
+          <option value="انرژی و برق">انرژی و برق</option>
+          <option value="کشاورزی و دامپروری">کشاورزی و دامپروری</option>
+          <option value="مواد غذایی و صنایع تبدیلی">مواد غذایی و صنایع تبدیلی</option>
+          <option value="حمل‌ونقل و لجستیک">حمل‌ونقل و لجستیک</option>
+          <option value="خودرو و قطعات">خودرو و قطعات</option>
+          <option value="تعمیرات خودرو">تعمیرات خودرو</option>
+          <option value="گردشگری و هتلداری">گردشگری و هتلداری</option>
+          <option value="آژانس مسافرتی">آژانس مسافرتی</option>
+          <option value="مد و پوشاک">مد و پوشاک</option>
+          <option value="زیبایی و آرایش">زیبایی و آرایش</option>
+          <option value="ورزش و تناسب اندام">ورزش و تناسب اندام</option>
+          <option value="روان‌شناسی و مشاوره">روان‌شناسی و مشاوره</option>
+          <option value="دندان‌پزشکی">دندان‌پزشکی</option>
+          <option value="داروخانه و تجهیزات پزشکی">داروخانه و تجهیزات پزشکی</option>
+          <option value="دامپزشکی">دامپزشکی</option>
+          <option value="مالی و حسابداری">مالی و حسابداری</option>
+          <option value="بانک و بیمه">بانک و بیمه</option>
+          <option value="سرمایه‌گذاری">سرمایه‌گذاری</option>
+          <option value="بازرگانی و صادرات و واردات">بازرگانی و صادرات و واردات</option>
+          <option value="مشاوره مدیریت">مشاوره مدیریت</option>
+          <option value="منابع انسانی و استخدام">منابع انسانی و استخدام</option>
+          <option value="ترجمه و زبان">ترجمه و زبان</option>
+          <option value="پژوهش و دانشگاه">پژوهش و دانشگاه</option>
+          <option value="خدمات منزل و نظافت">خدمات منزل و نظافت</option>
+          <option value="تأسیسات و لوله‌کشی">تأسیسات و لوله‌کشی</option>
+          <option value="لوازم خانگی و تعمیرات">لوازم خانگی و تعمیرات</option>
+          <option value="موبایل و رایانه">موبایل و رایانه</option>
+          <option value="جواهر و زیورآلات">جواهر و زیورآلات</option>
+          <option value="گل و گیاه">گل و گیاه</option>
+          <option value="رویداد و تشریفات">رویداد و تشریفات</option>
+          <option value="خدمات عمومی و اجتماعی">خدمات عمومی و اجتماعی</option>
+          <option value="مؤسسات خیریه">مؤسسات خیریه</option>
+          <option value="انتشارات و کتاب">انتشارات و کتاب</option>
+          <option value="اسباب‌بازی و کودک">اسباب‌بازی و کودک</option>
           <option value="سایر" data-i18n="cat9"></option>
         </select>
+        <input id="custom-category" placeholder="دسته‌بندی دلخواه (اختیاری؛ جایگزین انتخاب بالا)" maxlength="80">
       </div>
 
       <div class="form-group">
         <label for="title-field" data-i18n="labelTitle"></label>
         <input type="text" id="title-field" maxlength="120" data-i18n-ph="titlePlaceholder">
+        <p>سمت بالا مربوط به شماره اصلی است. برای افراد دیگر، سمت و شماره جدا اضافه کنید.</p>
+        <div id="team-contacts"></div>
+        <button type="button" onclick="addTeamContact()">＋ افزودن سمت و شماره تماس دیگر</button>
       </div>
 
       <div class="form-group">
@@ -295,7 +345,6 @@ button:disabled { background: #999; cursor: default; }
         <h3 data-i18n="qr1Title"></h3>
         <p style="font-size:12px;color:#666;" data-i18n="qr1Hint"></p>
         <img class="qr-image" id="qr-main" alt="Main QR">
-        <img id="result-photo" class="result-avatar" alt="Profile Photo">
         <div class="info-box" id="info-main"></div>
 
         <div class="actions">
@@ -303,9 +352,8 @@ button:disabled { background: #999; cursor: default; }
           <button type="button" class="full btn-purple" id="btn-save-phone" onclick="saveToPhone()"></button>
           <button type="button" class="btn-blue btn-small" onclick="addContact()" data-i18n="btnContact"></button>
           <button type="button" class="btn-blue btn-small" onclick="downloadQR('qr-main', 'Main')" data-i18n="btnDownload"></button>
-          <button type="button" class="btn-blue btn-small" onclick="downloadCurrentCsv()" data-i18n="btnDownloadCsv"></button>
           <button type="button" class="btn-blue btn-small" onclick="shareCard()" data-i18n="btnShare"></button>
-          <button type="button" class="btn-blue btn-small full" onclick="downloadCurrentData()" data-i18n="btnDownloadJson"></button>
+          <button type="button" class="btn-blue btn-small" onclick="downloadCurrentData()" data-i18n="btnDownloadJson"></button>
         </div>
       </div>
 
@@ -419,6 +467,15 @@ button:disabled { background: #999; cursor: default; }
     measurementId: "G-TD7QWNY8ME"
   };
 
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
+  window.uploadCardPhoto = async function(blob) {
+    const auth = getAuth();
+    if (!auth.currentUser) await signInAnonymously(auth);
+    const dest = ref(getStorage(), 'card-photos/' + auth.currentUser.uid + '/' + crypto.randomUUID() + '.jpg');
+    await uploadBytes(dest, blob, {contentType:'image/jpeg'});
+    return getDownloadURL(dest);
+  };
   let db = null;
   try { db = getFirestore(initializeApp(firebaseConfig)); } catch (e) { console.error("Firebase init error:", e); }
 
@@ -430,7 +487,7 @@ button:disabled { background: #999; cursor: default; }
     } catch (e) {
       console.error("Error adding document:", e);
       if (e.code === 'permission-denied') {
-        const extra = ['lat', 'lng', 'email', 'website', 'instagram', 'whatsapp', 'telegram', 'eitaa', 'bale', 'rubika'];
+        const extra = ['contacts', 'photoUrl', 'lat', 'lng', 'email', 'website', 'instagram', 'whatsapp', 'telegram', 'eitaa', 'bale', 'rubika'];
         if (extra.some(k => k in data)) {
           const rest = { ...data };
           extra.forEach(k => delete rest[k]);
@@ -457,6 +514,8 @@ let currentType = 'business';
 let lastFormData = null;
 let currentCoords = null;
 let photoBase64 = '';
+let uploadedPhotoUrl = '';
+let buildingCard = false;
 let cloudSaved = false;
 let deferredPrompt = null;
 const LS_KEY = 'artemin_cards_v1';
@@ -479,11 +538,7 @@ const translations = {
     savedPartial: '⚠️ Saved, but without new fields. Update the Firebase rules (see README).',
     tabForm: '📝 Form', tabSaved: '📱 Saved on phone',
     labelType: 'Card Type', typeBusiness: '🏪 Business', typePersonal: '👤 Personal',
-    labelName: 'Business / Full Name',
-    labelBusinessName: 'Business Name', labelPersonalName: 'Full Name',
-    labelManager: 'Manager / Owner Name (Optional)', managerPlaceholder: 'e.g. John Doe, CEO', manager: 'Manager',
-    btnEdit: '✏️ Edit', btnDownloadCsv: '📊 Excel (CSV)',
-    labelPhone: 'Phone Number', btnAddPhone: '➕ Add More Phone',
+    labelName: 'Name', labelPhone: 'Phone Number', btnAddPhone: '➕ Add More Phone',
     labelCategory: 'Job Category (folder)', labelTitle: 'Job Title', labelDescription: 'Additional Description',
     labelEmail: 'Email (Optional)', emailPlaceholder: 'e.g. info@example.com',
     labelWebsite: 'Website (Optional)', websitePlaceholder: 'e.g. https://mywebsite.com',
@@ -496,7 +551,7 @@ const translations = {
     btnGenerate: '⚡ Generate QR Codes', resultTitle: '✅ QR Cards Ready!',
     mapTitle: '🌐 Map Registration', mapHint: 'One tap: copy the info and open the map app',
     btnGoogleMaps: '📍 Register on Google Maps', btnNeshan: '🗺️ Register on Neshan',
-    qr1Title: '📱 QR 1: Your Card', qr1Hint: 'Scan to save contact',
+    qr1Title: '📱 QR 1: Your Card', qr1Hint: 'Scan to open your public card and social links',
     qr2Title: '🛠️ QR 2: Artemin Land', qr2Hint: 'Creator of this card',
     btnDownload: '📥 Download QR', btnDownloadJson: '💾 Info (JSON)',
     btnContact: '👤 Add to contacts', btnShare: '📤 Share / Send',
@@ -546,11 +601,7 @@ const translations = {
     savedPartial: '⚠️ ذخیره شد، ولی بدون فیلدهای جدید. قوانین فایربیس را به‌روز کنید (README).',
     tabForm: '📝 فرم', tabSaved: '📱 ذخیره‌شده در گوشی',
     labelType: 'نوع کارت', typeBusiness: '🏪 کسب‌وکار', typePersonal: '👤 شخصی',
-    labelName: 'نام کسب‌وکار / شخص',
-    labelBusinessName: 'نام کسب‌وکار (فروشگاه / شرکت)', labelPersonalName: 'نام و نام خانوادگی',
-    labelManager: 'نام مدیریت (اختیاری)', managerPlaceholder: 'مثال: مهندس احمدی، مدیرعامل', manager: 'مدیریت',
-    btnEdit: '✏️ ویرایش', btnDownloadCsv: '📊 اکسل (CSV)',
-    labelPhone: 'شماره تماس', btnAddPhone: '➕ افزودن شماره بیشتر',
+    labelName: 'نام', labelPhone: 'شماره تماس', btnAddPhone: '➕ افزودن شماره بیشتر',
     labelCategory: 'سرفصل شغلی (دسته‌بندی)', labelTitle: 'عنوان شغلی', labelDescription: 'توضیحات تکمیلی',
     labelEmail: 'ایمیل (اختیاری)', emailPlaceholder: 'مثال: info@example.com',
     labelWebsite: 'وب‌سایت (اختیاری)', websitePlaceholder: 'مثال: https://mysite.com',
@@ -563,7 +614,7 @@ const translations = {
     btnGenerate: '⚡ ساخت کیو آر کد', resultTitle: '✅ کیو آر کد آماده است!',
     mapTitle: '🌐 ثبت در نقشه', mapHint: 'یک لمس: اطلاعات کپی می‌شود و نقشه باز می‌شود',
     btnGoogleMaps: '📍 ثبت در گوگل مپ', btnNeshan: '🗺️ ثبت در نشان',
-    qr1Title: '📱 کیو آر ۱: کارت شما', qr1Hint: 'برای ذخیره مخاطب اسکن کنید',
+    qr1Title: '📱 کیو آر ۱: کارت شما', qr1Hint: 'برای باز کردن کارت عمومی و شبکه‌های اجتماعی اسکن کنید',
     qr2Title: '🛠️ کیو آر ۲: آرتمین لند', qr2Hint: 'سازنده این کارت',
     btnDownload: '📥 دانلود QR', btnDownloadJson: '💾 اطلاعات (JSON)',
     btnContact: '👤 افزودن به مخاطبین', btnShare: '📤 اشتراک / ارسال',
@@ -633,7 +684,7 @@ async function copyText(text) {
 }
 
 function cloudPayload(c) {
-  const keys = ['name', 'manager', 'phones', 'title', 'description', 'address', 'category', 'type', 'registerGoogle', 'registerNeshan', 'hasPhoto', 'lat', 'lng', 'email', 'website', 'instagram', 'whatsapp', 'telegram', 'eitaa', 'bale', 'rubika'];
+  const keys = ['name', 'phones', 'title', 'description', 'address', 'category', 'type', 'registerGoogle', 'registerNeshan', 'hasPhoto', 'contacts', 'photoUrl', 'lat', 'lng', 'email', 'website', 'instagram', 'whatsapp', 'telegram', 'eitaa', 'bale', 'rubika'];
   const out = {};
   keys.forEach(k => { if (c[k] !== undefined && c[k] !== null) out[k] = c[k]; });
   return out;
@@ -677,19 +728,7 @@ function setType(type) {
   currentType = type;
   $('type-business').classList.toggle('active', type === 'business');
   $('type-personal').classList.toggle('active', type === 'personal');
-  const t = T();
-  if (type === 'business') {
-    $('name').placeholder = t.namePlaceholderBusiness;
-    if ($('label-name')) $('label-name').textContent = t.labelBusinessName;
-    if ($('manager-group')) $('manager-group').style.display = 'block';
-  } else {
-    $('name').placeholder = t.namePlaceholderPersonal;
-    if ($('label-name')) $('label-name').textContent = t.labelPersonalName;
-    if ($('manager-group')) {
-      $('manager-group').style.display = 'none';
-      if ($('manager')) $('manager').value = '';
-    }
-  }
+  $('name').placeholder = type === 'business' ? T().namePlaceholderBusiness : T().namePlaceholderPersonal;
 }
 
 // ---------- شماره‌ها و عکس ----------
@@ -700,31 +739,29 @@ function addPhoneField(val = '') {
   row.querySelector('button').addEventListener('click', () => row.remove());
   $('phones-container').appendChild(row);
 }
+function addTeamContact() {
+  if ($('team-contacts').children.length >= 10) { alert('حداکثر ۱۰ مخاطب دیگر قابل افزودن است.'); return; }
+  const row = document.createElement('div'); row.className = 'team-row';
+  row.innerHTML = '<input class="team-role" maxlength="80" placeholder="سمت (مثلاً مدیر فروش)" required><input class="team-name" maxlength="80" placeholder="نام شخص (اختیاری)"><input class="team-phone" type="tel" placeholder="شماره تماس" required><button type="button">حذف این سمت</button>';
+  row.querySelector('button').onclick = () => row.remove();
+  $('team-contacts').appendChild(row);
+}
 function handlePhotoUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
+  if (!/^image\/(jpeg|png|webp)$/.test(file.type) || file.size > 10*1024*1024) { alert('عکس JPG، PNG یا WebP با حجم حداکثر ۱۰ مگابایت انتخاب کنید.'); return; }
   const reader = new FileReader();
   reader.onload = e => {
-    const img = new Image();
-    img.onload = () => {
+    const image = new Image();
+    image.onload = () => {
       const canvas = document.createElement('canvas');
-      const maxDim = 200;
-      let w = img.width, h = img.height;
-      if (w > h) {
-        if (w > maxDim) { h = Math.round((h * maxDim) / w); w = maxDim; }
-      } else {
-        if (h > maxDim) { w = Math.round((w * maxDim) / h); h = maxDim; }
-      }
-      canvas.width = w;
-      canvas.height = h;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, w, h);
-      photoBase64 = canvas.toDataURL('image/jpeg', 0.85);
-      $('photo-preview').src = photoBase64;
-      $('photo-preview').style.display = 'block';
-      $('photo-hint').style.display = 'none';
+      const scale = Math.min(1, 640 / Math.max(image.width, image.height));
+      canvas.width = Math.max(1, Math.round(image.width*scale)); canvas.height = Math.max(1, Math.round(image.height*scale));
+      canvas.getContext('2d').drawImage(image,0,0,canvas.width,canvas.height);
+      photoBase64 = canvas.toDataURL('image/jpeg', 0.8); uploadedPhotoUrl = '';
+      $('photo-preview').src = photoBase64; $('photo-preview').style.display = 'block'; $('photo-hint').style.display = 'none';
     };
-    img.src = e.target.result;
+    image.src = e.target.result;
   };
   reader.readAsDataURL(file);
 }
@@ -874,6 +911,7 @@ function onScanSuccess(decodedText) {
       if (v.instagram) $('instagram').value = v.instagram;
       if (v.telegram) $('telegram').value = v.telegram;
       if (v.eitaa) $('eitaa').value = v.eitaa;
+      ['bale','rubika','whatsapp'].forEach(k => { if (v[k]) $(k).value = v[k]; });
       showStatus('✅ اطلاعات کارت ویزیت با موفقیت درج شد.', 'success');
     }
     return;
@@ -898,7 +936,7 @@ function onScanSuccess(decodedText) {
 }
 
 // ---------- ساخت کارت ----------
-$('form').addEventListener('submit', function (e) {
+$('form').addEventListener('submit', async function (e) {
   e.preventDefault();
   const t = T();
   const name = $('name').value.trim();
@@ -923,19 +961,42 @@ $('form').addEventListener('submit', function (e) {
   const email = AL.normEmail(emRaw);
   const website = AL.normUrl(weRaw);
 
+  if ((igRaw && !instagram) || (tgRaw && !telegram) || (eiRaw && !eitaa) || (baRaw && !bale) || (ruRaw && !rubika) || (waRaw && !whatsapp) || (emRaw && !email)) {
+    alert(t.invalidSocial);
+    return;
+  }
+
+  if (buildingCard) return;
+  if (photoBase64 && !uploadedPhotoUrl) {
+    buildingCard = true;
+    const photoToUpload = photoBase64;
+    try {
+      showStatus('در حال آپلود عکس؛ کمی صبر کنید…', 'success');
+      if (!window.uploadCardPhoto) throw new Error('Firebase module unavailable');
+      const blob = await (await fetch(photoToUpload)).blob();
+      const url = await window.uploadCardPhoto(blob);
+      if (photoBase64 !== photoToUpload) { alert('عکس تغییر کرد؛ دوباره ساخت کارت را بزنید.'); return; }
+      uploadedPhotoUrl = url;
+    } catch(err) {
+      console.error(err);
+      alert('آپلود عکس انجام نشد. Storage، ورود ناشناس و قوانین Firebase را مطابق راهنما فعال کنید. برای ساخت کارت بدون عکس، فرم را پاک کنید و بدون عکس بسازید.');
+      return;
+    } finally { buildingCard = false; }
+  }
+  const contacts = [...document.querySelectorAll('.team-row')].map(row => ({role:row.querySelector('.team-role').value.trim(),name:row.querySelector('.team-name').value.trim(),phone:AL.normDigits(row.querySelector('.team-phone').value)}));
+  if (contacts.some(c => !c.role || !/^\+?\d{8,15}$/.test(c.phone))) { alert('سمت و شماره معتبر را برای هر مخاطب وارد کنید.'); return; }
   const card = {
+    contacts, photoUrl: uploadedPhotoUrl,
     name, phones,
-    manager: $('manager') ? $('manager').value.trim() : '',
     title: $('title-field').value.trim(),
     description: $('description').value.trim(),
     address: $('address').value.trim(),
-    category: $('category').value,
+    category: $('custom-category').value.trim() || $('category').value,
     type: currentType,
     registerGoogle: $('check-google').checked,
     registerNeshan: $('check-neshan').checked,
     hasPhoto: !!photoBase64
   };
-  if (photoBase64) card.photo = photoBase64;
   if (currentCoords) { card.lat = currentCoords.lat; card.lng = currentCoords.lng; }
   if (email) card.email = email;
   if (website) card.website = website;
@@ -949,20 +1010,15 @@ $('form').addEventListener('submit', function (e) {
   lastFormData = card;
   cloudSaved = false;
 
-  $('qr-main').src = AL.qrDataUrl(AL.buildVCard(card, false), 512);
+  try {
+    $('qr-main').src = AL.qrDataUrl(AL.cardUrl(card), 512);
+  } catch (err) {
+    alert('اطلاعات برای ساخت QR بیش از حد طولانی است. توضیحات یا آدرس را کوتاه‌تر کنید و دوباره کارت بسازید.');
+    return;
+  }
   $('qr-creator').src = AL.qrDataUrl(AL.CREATOR_VCARD, 512);
 
-  if (card.photo) {
-    $('result-photo').src = card.photo;
-    $('result-photo').style.display = 'block';
-  } else {
-    $('result-photo').style.display = 'none';
-  }
-
   let info = `<p><strong>${t.name}:</strong> ${esc(name)}</p>`;
-  if (card.type === 'business' && card.manager) {
-    info += `<p><strong>${t.manager}:</strong> ${esc(card.manager)}</p>`;
-  }
   info += `<p><strong>${t.type}:</strong> ${card.type === 'business' ? t.business : t.personal}</p>`;
   info += `<p><strong>${t.phone}:</strong> <span dir="ltr">${esc(phones.join(' - '))}</span></p>`;
   if (card.category) info += `<p><strong>${t.category}:</strong> ${esc(catLabel(card.category))}</p>`;
@@ -978,7 +1034,15 @@ $('form').addEventListener('submit', function (e) {
       info += `<p><strong>${s.label}:</strong> <a href="${esc(s.url)}" target="_blank" rel="noopener" dir="ltr">${esc(s.value)}</a></p>`;
     }
   });
+  const publicUrl = AL.cardUrl(card);
+  info += `<p><a href="${esc(publicUrl)}" target="_blank" rel="noopener">🌐 باز کردن صفحه عمومی کارت و شبکه‌های اجتماعی</a></p><p style="font-size:12px">این لینک عمومی است؛ اطلاعات حساس وارد نکنید. تغییر اطلاعات، لینک و QR تازه می‌سازد.</p>`;
+  if (card.photoUrl) info += `<img src="${esc(card.photoUrl)}" alt="عکس پروفایل" style="width:120px;border-radius:16px">`;
+  card.contacts.forEach(c => { info += `<p>${esc(c.role)} — ${esc(c.name)}: <a href="tel:${esc(c.phone)}">${esc(c.phone)}</a></p>`; });
   $('info-main').innerHTML = info;
+  const copyLink = document.createElement('button');
+  copyLink.type = 'button'; copyLink.textContent = '🔗 کپی لینک عمومی کارت';
+  copyLink.onclick = async () => { await copyText(publicUrl); copyLink.textContent = '✅ لینک کپی شد'; };
+  $('info-main').appendChild(copyLink);
 
   $('info-creator').innerHTML =
     `<p><strong>${t.name}:</strong> ${t.creatorName}</p>` +
@@ -1016,9 +1080,7 @@ function resetForm() {
   $('phones-container').innerHTML = '<div class="phone-row"><input type="tel" class="phone-input" inputmode="tel" placeholder="09153136173"></div>';
   $('photo-preview').style.display = 'none';
   $('photo-hint').style.display = 'block';
-  $('result-photo').style.display = 'none';
-  $('result-photo').src = '';
-  photoBase64 = '';
+  photoBase64 = ''; uploadedPhotoUrl = ''; $('team-contacts').innerHTML = '';
   currentCoords = null;
   lastFormData = null;
   cloudSaved = false;
@@ -1060,7 +1122,7 @@ function saveToPhone() {
 
 function addContact() {
   if (!lastFormData) return;
-  AL.downloadText('Contact-' + AL.safeName(lastFormData.name) + '.vcf', AL.buildVCard(lastFormData, true) + '\r\n', 'text/vcard;charset=utf-8');
+  AL.downloadText('Contact-' + AL.safeName(lastFormData.name) + '.vcf', AL.buildVCard(lastFormData) + '\r\n', 'text/vcard;charset=utf-8');
   showStatus(T().contactDone, 'success');
 }
 
@@ -1094,13 +1156,6 @@ function downloadCurrentData() {
   const { _phoneSaved, ...data } = lastFormData;
   AL.downloadText(`ArteminLand-${AL.safeName(data.name)}-${Date.now()}.json`,
     JSON.stringify({ ...data, exportedAt: new Date().toISOString() }, null, 2), 'application/json');
-}
-
-function downloadCurrentCsv() {
-  if (!lastFormData) return;
-  const { _phoneSaved, ...data } = lastFormData;
-  AL.downloadText(`ArteminLand-${AL.safeName(data.name)}-${Date.now()}.csv`, AL.toCsv([data]), 'text/csv;charset=utf-8');
-  showStatus(currentLang === 'fa' ? '✅ فایل اکسل این کارت دانلود شد' : '✅ Excel file downloaded', 'success');
 }
 
 // ---------- لیست ذخیره‌شده در گوشی ----------
@@ -1142,25 +1197,7 @@ function renderSaved() {
 
     group.forEach(c => {
       const item = mk('div', 'saved-item');
-      if (c.photo) {
-        const topRow = mk('div', '', '');
-        topRow.style.cssText = 'display:flex;align-items:center;gap:10px;margin-bottom:6px;';
-        const img = mk('img', '', '');
-        img.src = c.photo;
-        img.style.cssText = 'width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid #2e7d32;flex-shrink:0;';
-        const h4 = mk('h4', '', c.name);
-        h4.style.margin = '0';
-        topRow.append(img, h4);
-        item.appendChild(topRow);
-      } else {
-        item.appendChild(mk('h4', '', c.name));
-      }
-      if (c.manager && c.type === 'business') {
-        const mp = mk('p', '', `${T().manager}: ${c.manager}`);
-        mp.style.color = '#1b5e20';
-        mp.style.fontWeight = 'bold';
-        item.appendChild(mp);
-      }
+      item.appendChild(mk('h4', '', c.name));
       const ph = mk('p', 'ltr', (c.phones || []).join(' - '));
       item.appendChild(ph);
       if (c.title) item.appendChild(mk('p', '', c.title));
@@ -1181,9 +1218,8 @@ function renderSaved() {
 
       const row = mk('div', 'row');
       const btn = (label, cls, fn) => { const b = mk('button', cls, label); b.type = 'button'; b.addEventListener('click', fn); row.appendChild(b); return b; };
-      btn(t.btnEdit, 'btn-orange', () => editSavedCard(c));
       btn(t.btnQr, 'btn-blue', () => showQrModal(c));
-      btn(t.btnVcf, 'btn-blue', () => AL.downloadText('Contact-' + AL.safeName(c.name) + '.vcf', AL.buildVCard(c, true) + '\r\n', 'text/vcard;charset=utf-8'));
+      btn(t.btnVcf, 'btn-blue', () => AL.downloadText('Contact-' + AL.safeName(c.name) + '.vcf', AL.buildVCard(c) + '\r\n', 'text/vcard;charset=utf-8'));
       const cb = btn(t.btnToCloud, 'btn-teal', async () => {
         cb.disabled = true;
         const ok = await sendToCloud(c);
@@ -1202,83 +1238,17 @@ function renderSaved() {
   });
 }
 
-function editSavedCard(card) {
-  switchTab('form');
-  setType(card.type || 'business');
-  $('name').value = card.name || '';
-  if ($('manager')) $('manager').value = card.manager || '';
-  $('category').value = card.category || '';
-  $('title-field').value = card.title || '';
-  $('description').value = card.description || '';
-  $('email').value = card.email || '';
-  $('website').value = card.website || '';
-  $('address').value = card.address || '';
-  $('instagram').value = card.instagram || '';
-  $('telegram').value = card.telegram || '';
-  $('eitaa').value = card.eitaa || '';
-  $('bale').value = card.bale || '';
-  $('rubika').value = card.rubika || '';
-  $('whatsapp').value = card.whatsapp || '';
-
-  const pContainer = $('phones-container');
-  pContainer.innerHTML = '';
-  const phones = Array.isArray(card.phones) ? card.phones : (card.phone ? [card.phone] : []);
-  if (phones.length) {
-    phones.forEach((p, i) => {
-      if (i === 0) {
-        pContainer.innerHTML = `<div class="phone-row"><input type="tel" class="phone-input" inputmode="tel" placeholder="09153136173" value="${esc(p)}"></div>`;
-      } else {
-        addPhoneField(p);
-      }
-    });
-  } else {
-    pContainer.innerHTML = `<div class="phone-row"><input type="tel" class="phone-input" inputmode="tel" placeholder="09153136173"></div>`;
-  }
-
-  if (card.photo) {
-    photoBase64 = card.photo;
-    $('photo-preview').src = photoBase64;
-    $('photo-preview').style.display = 'block';
-    $('photo-hint').style.display = 'none';
-  } else {
-    photoBase64 = '';
-    $('photo-preview').style.display = 'none';
-    $('photo-hint').style.display = 'block';
-  }
-
-  if (card.lat && card.lng) {
-    currentCoords = { lat: card.lat, lng: card.lng };
-  } else {
-    currentCoords = null;
-  }
-
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-  showStatus(currentLang === 'fa' ? '✏️ کارت برای ویرایش بارگذاری شد. پس از تغییرات دکمه ساخت کیو آر را بزنید.' : '✏️ Card loaded for editing.', 'success');
-}
-
 function exportSaved(kind) {
   const list = getSavedView();
-  if (!list.length) {
-    alert(currentLang === 'fa' 
-      ? '⚠️ در حال حاضر هیچ شماره یا کارتی در حافظه این گوشی ذخیره نشده است.\n\nراهنما: ابتدا در فرم، کارت را بسازید و دکمه بنفش «📱 ذخیره در همین گوشی» را بزنید تا در لیست ذخیره شود؛ سپس می‌توانید خروجی اکسل یا مخاطبین بگیرید.'
-      : '⚠️ No cards currently saved on this device.\n\nPlease generate a card and click "Save on this phone" first.');
-    return;
-  }
+  if (!list.length) return;
   const stamp = Date.now();
-  if (kind === 'vcf') {
-    AL.downloadText(`Artemin-contacts-${stamp}.vcf`, AL.vcardsFile(list), 'text/vcard;charset=utf-8');
-    showStatus(currentLang === 'fa' ? '✅ فایل مخاطبین دانلود شد' : '✅ Contacts file downloaded', 'success');
-  } else if (kind === 'csv') {
-    AL.downloadText(`Artemin-cards-backup-${stamp}.csv`, AL.toCsv(list), 'text/csv;charset=utf-8');
-    showStatus(currentLang === 'fa' ? '✅ فایل اکسل شماره‌ها دانلود شد' : '✅ Excel file downloaded', 'success');
-  } else {
-    AL.downloadText(`Artemin-cards-backup-${stamp}.json`, JSON.stringify({ exportedAt: new Date().toISOString(), total: list.length, cards: list }, null, 2), 'application/json');
-    showStatus(currentLang === 'fa' ? '✅ فایل JSON بک‌آپ دانلود شد' : '✅ JSON backup downloaded', 'success');
-  }
+  if (kind === 'vcf') AL.downloadText(`Artemin-contacts-${stamp}.vcf`, AL.vcardsFile(list), 'text/vcard;charset=utf-8');
+  else if (kind === 'csv') AL.downloadText(`Artemin-cards-${stamp}.csv`, AL.toCsv(list), 'text/csv;charset=utf-8');
+  else AL.downloadText(`Artemin-cards-${stamp}.json`, JSON.stringify({ exportedAt: new Date().toISOString(), total: list.length, cards: list }, null, 2), 'application/json');
 }
 
 function showQrModal(card) {
-  const url = AL.qrDataUrl(AL.buildVCard(card, false), 512);
+  const url = AL.qrDataUrl(AL.cardUrl(card), 512);
   $('qrModal-name').textContent = card.name;
   $('qrModal-img').src = url;
   $('qrModal-download').onclick = () => {
@@ -1296,7 +1266,6 @@ function mapFields() {
   const t = T(), c = lastFormData || {};
   return [
     { label: t.name, value: c.name },
-    { label: t.manager, value: c.manager },
     { label: t.category, value: c.category ? catLabel(c.category).replace(/^[^\p{L}\p{N}]+/u, '') : '' },
     { label: t.address, value: c.address },
     { label: t.phone, value: (c.phones || []).join(' - ') },

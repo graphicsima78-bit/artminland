@@ -6,7 +6,7 @@ service cloud.firestore {
 
       // ثبت مشتری جدید (از طریق فرم عمومی سایت با فیلدهای مجاز)
       allow create: if request.resource.data.keys().hasOnly([
-                         'name', 'manager', 'phones', 'title', 'description', 'address', 'category',
+                         'name', 'phones', 'title', 'description', 'address', 'category',
                          'type', 'registerGoogle', 'registerNeshan', 'hasPhoto', 'createdAt',
                          'lat', 'lng', 'email', 'website', 'instagram', 'whatsapp', 'telegram',
                          'eitaa', 'bale', 'rubika'
@@ -15,7 +15,6 @@ service cloud.firestore {
                     && request.resource.data.name is string
                     && request.resource.data.name.size() > 0
                     && request.resource.data.name.size() <= 120
-                    && request.resource.data.get('manager', '').size() <= 120
                     && request.resource.data.phones is list
                     && request.resource.data.phones.size() >= 1
                     && request.resource.data.phones.size() <= 10
