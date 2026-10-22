@@ -252,11 +252,11 @@ button:disabled { background: #999; cursor: default; }
       <!-- ایمیل و وب‌سایت -->
       <div class="form-group">
         <label for="email" data-i18n="labelEmail"></label>
-        <input type="email" id="email" maxlength="100" dir="ltr" autocomplete="off" data-i18n-ph="emailPlaceholder">
+        <input type="text" id="email" maxlength="100" dir="ltr" autocomplete="off" data-i18n-ph="emailPlaceholder">
       </div>
       <div class="form-group">
         <label for="website" data-i18n="labelWebsite"></label>
-        <input type="url" id="website" maxlength="200" dir="ltr" autocomplete="off" data-i18n-ph="websitePlaceholder">
+        <input type="text" id="website" maxlength="200" dir="ltr" autocomplete="off" data-i18n-ph="websitePlaceholder">
       </div>
 
       <!-- شبکه‌های اجتماعی و پیام‌رسان‌ها به همراه اسکنر هوشمند دوربین -->
@@ -477,7 +477,7 @@ button:disabled { background: #999; cursor: default; }
 <!-- Firebase: ذخیره در Firestore -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+  import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBUNhCBLHR10Q5J7lrigRpL4CuPk-y6toY",
@@ -495,20 +495,12 @@ button:disabled { background: #999; cursor: default; }
   window.saveToFirestore = async function (data, retryCount = 0) {
     if (!db) return false;
     try {
-      await addDoc(collection(db, "customers"), { ...data, createdAt: new Date().toISOString() });
+      const {id, ...payload} = data;
+      await setDoc(doc(db, "customers", id), { ...payload, createdAt: new Date().toISOString() });
       return true;
     } catch (e) {
       console.error("Error adding document:", e);
-      if (e.code === 'permission-denied') {
-        const extra = ['contacts', 'photoUrl', 'lat', 'lng', 'email', 'website', 'instagram', 'whatsapp', 'telegram', 'eitaa', 'bale', 'rubika'];
-        if (extra.some(k => k in data)) {
-          const rest = { ...data };
-          extra.forEach(k => delete rest[k]);
-          const ok = await window.saveToFirestore(rest, retryCount);
-          return ok ? 'partial' : false;
-        }
-        return false;
-      }
+      if (e.code === 'permission-denied') return false;
       if (retryCount < 3) {
         await new Promise(r => setTimeout(r, 1000));
         return window.saveToFirestore(data, retryCount + 1);
@@ -698,7 +690,7 @@ async function copyText(text) {
 }
 
 function cloudPayload(c) {
-  const keys = ['name', 'phones', 'title', 'description', 'address', 'category', 'type', 'registerGoogle', 'registerNeshan', 'hasPhoto', 'contacts', 'photoUrl', 'lat', 'lng', 'email', 'website', 'instagram', 'whatsapp', 'telegram', 'eitaa', 'bale', 'rubika'];
+  const keys = ['id', 'name', 'phones', 'title', 'description', 'address', 'category', 'type', 'registerGoogle', 'registerNeshan', 'hasPhoto', 'contacts', 'photoUrl', 'lat', 'lng', 'email', 'website', 'instagram', 'whatsapp', 'telegram', 'eitaa', 'bale', 'rubika'];
   const out = {};
   keys.forEach(k => { if (c[k] !== undefined && c[k] !== null) out[k] = c[k]; });
   return out;
@@ -876,6 +868,7 @@ let currentFacingMode = "environment";
 let activeTargetField = null;
 
 async function startScanner(targetField = null) {
+  if (!$('scannerModal').classList.contains('active')) history.pushState({artminScanner:true}, '', location.href);
   activeTargetField = targetField;
   $('scannerModal').classList.add('active');
   $('scanner-status').textContent = 'در حال راه‌اندازی دوربین...';
@@ -900,6 +893,7 @@ async function startScanner(targetField = null) {
       onScanSuccess,
       () => {}
     );
+    if (!$('scannerModal').classList.contains('active')) { await stopScannerCamera(); return; }
     $('scanner-status').textContent = 'کد را جلوی کادر نگه دارید';
   } catch (err) {
     console.warn("Camera start err:", err);
@@ -907,14 +901,22 @@ async function startScanner(targetField = null) {
   }
 }
 
-async function closeScanner() {
+function closeScanner(fromBack = false) {
+  const wasOpen = $('scannerModal').classList.contains('active');
+  $('scannerModal').classList.remove('active');
+  if (wasOpen && !fromBack && history.state && history.state.artminScanner) history.back();
+  stopScannerCamera();
+}
+window.addEventListener('popstate', () => {
+  if ($('scannerModal').classList.contains('active')) closeScanner(true);
+});
+async function stopScannerCamera() {
   if (html5QrScanner) {
     try {
       if (html5QrScanner.isScanning) await html5QrScanner.stop();
     } catch (e) {}
   }
-  $('scannerModal').classList.remove('active');
-  activeTargetField = null;
+
 }
 
 async function toggleCameraFacing() {
@@ -1014,19 +1016,14 @@ $('form').addEventListener('submit', async function (e) {
   const emRaw = $('email').value.trim();
   const weRaw = $('website').value.trim();
 
-  const instagram = AL.normInstagram(igRaw);
-  const telegram = AL.normTelegram(tgRaw);
-  const eitaa = AL.normEitaa(eiRaw);
-  const bale = AL.normBale(baRaw);
-  const rubika = AL.normRubika(ruRaw);
-  const whatsapp = AL.normWhatsapp(waRaw);
-  const email = AL.normEmail(emRaw);
-  const website = AL.normUrl(weRaw);
-
-  if ((igRaw && !instagram) || (tgRaw && !telegram) || (eiRaw && !eitaa) || (baRaw && !bale) || (ruRaw && !rubika) || (waRaw && !whatsapp) || (emRaw && !email)) {
-    alert(t.invalidSocial);
-    return;
-  }
+  const instagram = AL.normInstagram(igRaw) || igRaw;
+  const telegram = AL.normTelegram(tgRaw) || tgRaw;
+  const eitaa = AL.normEitaa(eiRaw) || eiRaw;
+  const bale = AL.normBale(baRaw) || baRaw;
+  const rubika = AL.normRubika(ruRaw) || ruRaw;
+  const whatsapp = AL.normWhatsapp(waRaw) || waRaw;
+  const email = AL.normEmail(emRaw) || emRaw;
+  const website = AL.normUrl(weRaw) || weRaw;
 
   const photoLink = $('photo-url').value.trim();
   uploadedPhotoUrl = '';
@@ -1041,7 +1038,7 @@ $('form').addEventListener('submit', async function (e) {
   const contacts = [...document.querySelectorAll('.team-row')].map(row => ({role:row.querySelector('.team-role').value.trim(),name:row.querySelector('.team-name').value.trim(),phone:AL.normDigits(row.querySelector('.team-phone').value)}));
   if (contacts.some(c => !c.role || !/^\+?\d{8,15}$/.test(c.phone))) { alert('سمت و شماره معتبر را برای هر مخاطب وارد کنید.'); return; }
   const card = {
-    ...(editingCardId ? {id:editingCardId} : {}),
+    id: editingCardId || crypto.randomUUID(),
     contacts, photoUrl: uploadedPhotoUrl,
     name, phones,
     title: $('title-field').value.trim(),
@@ -1063,6 +1060,7 @@ $('form').addEventListener('submit', async function (e) {
   if (rubika) card.rubika = rubika;
   if (whatsapp) card.whatsapp = whatsapp;
 
+  editingCardId = card.id;
   lastFormData = card;
   cloudSaved = false;
 
@@ -1121,6 +1119,14 @@ $('form').addEventListener('submit', async function (e) {
   refreshActionButtons();
   $('result').style.display = 'block';
   $('result').scrollIntoView({ behavior: 'smooth' });
+  showStatus('در حال ذخیره خودکار در فضای ابری…', 'success');
+  const saved = await sendToCloud(card);
+  if (lastFormData === card) {
+    cloudSaved = saved === true;
+    refreshActionButtons();
+    showStatus(saved === true ? '✅ کارت در فضای ابری ذخیره شد. ذخیره در گوشی فقط با دکمه مربوط انجام می‌شود.' : '⚠️ ذخیره ابری تأیید نشد؛ اینترنت یا قوانین Firebase را بررسی کنید. برای حفظ کارت فعلاً ذخیره در گوشی را بزنید و سپس دوباره ذخیره ابری را امتحان کنید.', saved === true ? 'success' : 'error');
+  }
+
 });
 
 function refreshActionButtons() {

@@ -388,6 +388,15 @@
     return csv;
   };
 
+  // Preserve user input; allow only safe web destinations when rendering links.
+  const originalSocialLinks = AL.socialLinks;
+  AL.socialLinks = d => originalSocialLinks(d).map(link => {
+    const raw = String(d[link.key] || '').trim();
+    if (/^https?:\/\//i.test(raw)) link.url = raw;
+    if (link.key === 'website' && !/^https?:\/\//i.test(link.url)) link.url = AL.normUrl(raw) || '';
+    if (link.key === 'email') link.url = 'mailto:' + encodeURIComponent(raw);
+    return link;
+  }).filter(link => /^(https?:\/\/|mailto:)/i.test(link.url));
   // Public, self-contained card links. No database read permissions required.
   AL.cardUrl = function (card) {
     const fields = ['contacts','photoUrl','category','name','title','description','address','phones','type','instagram','telegram','whatsapp','eitaa','bale','rubika','email','website'];
@@ -408,7 +417,7 @@
     if (typeof d.photoUrl === 'string') { try { const u = new URL(d.photoUrl); if(u.protocol === 'https:') out.photoUrl = u.href; } catch(e) {} }
     ['category','name','title','description','address','type'].forEach(k => { if (typeof d[k] === 'string') out[k] = d[k].slice(0, 4000); });
     const normalizers = {instagram:AL.normInstagram, telegram:AL.normTelegram, whatsapp:AL.normWhatsapp, eitaa:AL.normEitaa, bale:AL.normBale, rubika:AL.normRubika, email:AL.normEmail, website:AL.normUrl};
-    Object.keys(normalizers).forEach(k => { if (typeof d[k] === 'string') out[k] = normalizers[k](d[k]); });
+    Object.keys(normalizers).forEach(k => { if (typeof d[k] === 'string') out[k] = normalizers[k](d[k]) || d[k]; });
     out.phones = Array.isArray(d.phones) ? d.phones.filter(v => typeof v === 'string').slice(0,20).map(AL.normDigits).filter(Boolean) : [];
     return out;
   };
