@@ -318,10 +318,21 @@ button:disabled { background: #999; cursor: default; }
 
       <div class="form-group">
         <label data-i18n="labelPhoto"></label>
-        <div class="image-upload" onclick="document.getElementById('photo-input').click()">
-          <input type="file" id="photo-input" accept="image/*" onchange="handlePhotoUpload(event)">
+        <div class="image-upload" role="button" tabindex="0" aria-label="انتخاب عکس از دوربین یا گالری" onclick="openPhotoChooser()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openPhotoChooser();}">
+          <p>📷 انتخاب عکس از دوربین یا گالری</p>
           <p id="photo-hint" data-i18n="photoHint"></p>
-          <img id="photo-preview" class="image-preview" alt="Preview">
+          <img id="photo-preview" class="image-preview" alt="پیش‌نمایش عکس انتخابی">
+        </div>
+        <input type="file" id="photo-input" accept="image/*" hidden onchange="handlePhotoUpload(event)">
+        <input type="file" id="photo-camera-input" accept="image/*" capture="environment" hidden onchange="handlePhotoUpload(event)">
+        <div id="photo-source-dialog" role="dialog" aria-modal="true" aria-labelledby="photo-source-title" hidden style="position:fixed;inset:0;z-index:10000;background:#000b;padding:20px;align-content:center" onclick="if(event.target===this)closePhotoChooser()">
+          <div style="background:white;color:#222;max-width:360px;margin:auto;padding:24px;border-radius:18px;text-align:center">
+            <h3 id="photo-source-title">عکس را از کجا انتخاب می‌کنید؟</h3>
+            <button type="button" id="choose-photo-camera" onclick="pickPhotoSource(true)">📷 باز کردن دوربین</button>
+            <button type="button" onclick="pickPhotoSource(false)">🖼 انتخاب از گالری یا فایل‌ها</button>
+            <button type="button" onclick="closePhotoChooser()">انصراف</button>
+            <p style="font-size:12px">باز شدن دوربین به پشتیبانی گوشی و مرورگر بستگی دارد. روی رایانه ممکن است پنجره انتخاب فایل باز شود.</p>
+          </div>
         </div>
         <p>روش بدون Firebase Storage: عکس را انتخاب و دانلود کنید، سپس در پوشه photos مخزن عمومی خود بارگذاری کنید و لینک مستقیم آن را در کادر زیر بگذارید. انتخاب فایل به‌تنهایی عکس را برای دیگران ارسال نمی‌کند.</p>
         <button type="button" onclick="downloadPreparedPhoto()">۱. دانلود عکس آماده برای مخزن</button>
@@ -745,6 +756,32 @@ function addTeamContact() {
   row.querySelector('button').onclick = () => row.remove();
   $('team-contacts').appendChild(row);
 }
+let photoChooserFocus = null;
+function openPhotoChooser() {
+  photoChooserFocus = document.activeElement;
+  $('photo-source-dialog').hidden = false;
+  $('choose-photo-camera').focus();
+}
+function closePhotoChooser() {
+  $('photo-source-dialog').hidden = true;
+  if (photoChooserFocus) photoChooserFocus.focus();
+}
+function pickPhotoSource(camera) {
+  closePhotoChooser();
+  const input = $(camera ? 'photo-camera-input' : 'photo-input');
+  input.value = ''; input.click();
+}
+document.addEventListener('keydown', e => {
+  const dialog = $('photo-source-dialog');
+  if (dialog.hidden) return;
+  if (e.key === 'Escape') closePhotoChooser();
+  if (e.key === 'Tab') {
+    const buttons = [...dialog.querySelectorAll('button')];
+    const first = buttons[0], last = buttons[buttons.length-1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
+});
 function downloadPreparedPhoto() {
   if (!photoBase64) { alert('ابتدا یک عکس انتخاب کنید.'); return; }
   AL.downloadDataUrl(photoBase64, 'profile-' + Date.now() + '.jpg');
@@ -762,7 +799,7 @@ function previewOnlinePhoto() {
   } catch(e) { status.textContent = 'لینک مستقیم عکس باید با https:// شروع شود.'; }
 }
 function clearCardPhoto() {
-  photoBase64 = ''; uploadedPhotoUrl = ''; $('photo-input').value = ''; $('photo-url').value = '';
+  photoBase64 = ''; uploadedPhotoUrl = ''; $('photo-input').value = ''; $('photo-camera-input').value = ''; $('photo-url').value = '';
   $('photo-preview').style.display = 'none'; $('photo-hint').style.display = 'block';
   $('online-photo-preview').hidden = true; $('online-photo-preview').removeAttribute('src'); $('photo-url-status').textContent = '';
 }
@@ -781,6 +818,7 @@ function handlePhotoUpload(event) {
       photoBase64 = canvas.toDataURL('image/jpeg', 0.8); uploadedPhotoUrl = '';
       $('photo-preview').src = photoBase64; $('photo-preview').style.display = 'block'; $('photo-hint').style.display = 'none';
     };
+    image.onerror = () => alert('این فرمت عکس در مرورگر باز نشد؛ عکس JPG یا PNG انتخاب کنید.');
     image.src = e.target.result;
   };
   reader.readAsDataURL(file);
