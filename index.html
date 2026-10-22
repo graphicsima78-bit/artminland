@@ -528,6 +528,7 @@ let lastFormData = null;
 let currentCoords = null;
 let photoBase64 = '';
 let uploadedPhotoUrl = '';
+let editingCardId = null;
 
 let cloudSaved = false;
 let deferredPrompt = null;
@@ -1040,6 +1041,7 @@ $('form').addEventListener('submit', async function (e) {
   const contacts = [...document.querySelectorAll('.team-row')].map(row => ({role:row.querySelector('.team-role').value.trim(),name:row.querySelector('.team-name').value.trim(),phone:AL.normDigits(row.querySelector('.team-phone').value)}));
   if (contacts.some(c => !c.role || !/^\+?\d{8,15}$/.test(c.phone))) { alert('سمت و شماره معتبر را برای هر مخاطب وارد کنید.'); return; }
   const card = {
+    ...(editingCardId ? {id:editingCardId} : {}),
     contacts, photoUrl: uploadedPhotoUrl,
     name, phones,
     title: $('title-field').value.trim(),
@@ -1134,7 +1136,7 @@ function resetForm() {
   $('phones-container').innerHTML = '<div class="phone-row"><input type="tel" class="phone-input" inputmode="tel" placeholder="09153136173"></div>';
   $('photo-preview').style.display = 'none';
   $('photo-hint').style.display = 'block';
-  clearCardPhoto(); $('team-contacts').innerHTML = '';
+  clearCardPhoto(); editingCardId = null; $('team-contacts').innerHTML = '';
   currentCoords = null;
   lastFormData = null;
   cloudSaved = false;
@@ -1242,6 +1244,40 @@ function downloadCurrentData() {
 }
 
 // ---------- لیست ذخیره‌شده در گوشی ----------
+function editSavedCard(card) {
+  resetForm();
+  // Older locally stored cards may not yet have an ID.
+  if (!card.id) {
+    const list = loadLocal(); const index = list.findIndex(c => localCardKey(c) === localCardKey(card));
+    if (index < 0) { alert('کارت پیدا نشد.'); return; }
+    list[index].id = crypto.randomUUID();
+    if (!storeLocal(list)) { alert('امکان ذخیره شناسه کارت وجود ندارد.'); return; }
+    card = list[index];
+  }
+  editingCardId = card.id;
+  setType(card.type || 'business');
+  const fields = {name:'name',title:'title-field',description:'description',address:'address',email:'email',website:'website',instagram:'instagram',telegram:'telegram',whatsapp:'whatsapp',eitaa:'eitaa',bale:'bale',rubika:'rubika'};
+  Object.entries(fields).forEach(([key,id]) => { $(id).value = card[key] || ''; });
+  $('phones-container').innerHTML = '';
+  const phones = Array.isArray(card.phones) && card.phones.length ? card.phones : [card.phone || ''];
+  phones.forEach(phone => addPhoneField(phone));
+  const category = card.category || '';
+  if ([...$('category').options].some(o => o.value === category)) $('category').value = category;
+  else $('custom-category').value = category;
+  (card.contacts || []).slice(0,10).forEach(c => {
+    addTeamContact(); const row = $('team-contacts').lastElementChild;
+    row.querySelector('.team-role').value = c.role || '';
+    row.querySelector('.team-name').value = c.name || '';
+    row.querySelector('.team-phone').value = c.phone || '';
+  });
+  if(card.photoUrl) { $('photo-url').value = card.photoUrl; uploadedPhotoUrl = card.photoUrl; previewOnlinePhoto(); }
+  $('check-google').checked = !!card.registerGoogle;
+  $('check-neshan').checked = !!card.registerNeshan;
+  currentCoords = AL.hasCoords(card) ? {lat:card.lat,lng:card.lng} : null;
+  switchTab('form');
+  showStatus('✏️ در حال ویرایش: ' + card.name + ' — پس از تغییرات، ساخت کارت و سپس ذخیره در همین گوشی را بزنید تا همین کارت به‌روزرسانی شود.', 'success');
+  $('name').focus();
+}
 function getSavedView() {
   const all = loadLocal();
   const f = $('saved-filter').value || '__all__';
@@ -1301,6 +1337,7 @@ function renderSaved() {
 
       const row = mk('div', 'row');
       const btn = (label, cls, fn) => { const b = mk('button', cls, label); b.type = 'button'; b.addEventListener('click', fn); row.appendChild(b); return b; };
+      btn('✏️ ویرایش', 'btn-orange', () => editSavedCard(c));
       btn(t.btnQr, 'btn-blue', () => showQrModal(c));
       btn(t.btnVcf, 'btn-blue', () => AL.downloadText('Contact-' + AL.safeName(c.name) + '.vcf', AL.buildVCard(c) + '\r\n', 'text/vcard;charset=utf-8'));
       const cb = btn(t.btnToCloud, 'btn-teal', async () => {
