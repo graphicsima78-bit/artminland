@@ -305,6 +305,19 @@
     return 'https://api.qrserver.com/v1/create-qr-code/?size=500x500&margin=10&charset-source=UTF-8&data=' + encodeURIComponent(text);
   };
 
+  AL.namedQr = function(text, name) {
+    const qr = AL.qrCanvas(text, 512);
+    if (!qr) throw new Error('QR library unavailable');
+    const cv = document.createElement('canvas'); cv.width = 600; cv.height = 710;
+    const ctx = cv.getContext('2d'); ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,600,710);
+    ctx.drawImage(qr,44,32,512,512);
+    ctx.fillStyle = '#151515'; ctx.textAlign = 'center'; ctx.direction = AL.detectDir(name);
+    const label = String(name || 'کارت').slice(0,120);
+    let size = 32; do { ctx.font = 'bold '+size+'px Tahoma, Arial'; if(ctx.measureText(label).width <= 540) break; size--; } while(size > 14);
+    ctx.fillText(label,300,605,540);
+    ctx.font = '16px Tahoma, Arial'; ctx.fillStyle = '#555'; ctx.fillText('اسکن کنید و کارت را باز کنید',300,655);
+    return cv.toDataURL('image/png');
+  };
   // ---------- دانلود ----------
   AL.downloadBlob = function (blob, filename) {
     const url = URL.createObjectURL(blob);

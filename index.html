@@ -371,6 +371,7 @@ button:disabled { background: #999; cursor: default; }
           <button type="button" class="full btn-purple" id="btn-save-phone" onclick="saveToPhone()"></button>
           <button type="button" onclick="saveToPhone(true)">ساخت و ذخیره یک کپی جداگانه</button>
           <button type="button" class="btn-blue btn-small" onclick="addContact()" data-i18n="btnContact"></button>
+          <button type="button" onclick="chooseQrDownloadFolder()">📁 انتخاب محل پوشه کیو آر کد</button>
           <button type="button" class="btn-blue btn-small" onclick="downloadQR('qr-main', 'Main')" data-i18n="btnDownload"></button>
           <button type="button" class="btn-blue btn-small" onclick="shareCard()" data-i18n="btnShare"></button>
           <button type="button" class="btn-blue btn-small" onclick="downloadCurrentData()" data-i18n="btnDownloadJson"></button>
@@ -1065,12 +1066,12 @@ $('form').addEventListener('submit', async function (e) {
   cloudSaved = false;
 
   try {
-    $('qr-main').src = AL.qrDataUrl(AL.cardUrl(card), 512);
+    $('qr-main').src = AL.namedQr(AL.cardUrl(card), card.name);
   } catch (err) {
     alert('اطلاعات برای ساخت QR بیش از حد طولانی است. توضیحات یا آدرس را کوتاه‌تر کنید و دوباره کارت بسازید.');
     return;
   }
-  $('qr-creator').src = AL.qrDataUrl(AL.CREATOR_VCARD, 512);
+  $('qr-creator').src = AL.namedQr(AL.CREATOR_VCARD, AL.CREATOR_DATA.name);
 
   let info = `<p><strong>${t.name}:</strong> ${esc(name)}</p>`;
   info += `<p><strong>${t.type}:</strong> ${card.type === 'business' ? t.business : t.personal}</p>`;
@@ -1224,7 +1225,7 @@ async function shareCard() {
     .filter(Boolean).join('\n');
   try {
     const blob = await (await fetch($('qr-main').src)).blob();
-    const file = new File([blob], 'ArteminLand-QR.png', { type: 'image/png' });
+    const file = new File([blob], AL.safeName(c.name) + '.png', { type: 'image/png' });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       await navigator.share({ files: [file], title: c.name, text });
       return;
@@ -1235,11 +1236,35 @@ async function shareCard() {
   window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
 }
 
-function downloadQR(elementId, filename) {
+let qrDownloadDirectory = null;
+async function chooseQrDownloadFolder() {
+  if (!window.showDirectoryPicker) { alert('این مرورگر انتخاب پوشه را پشتیبانی نمی‌کند. فایل‌ها با نام کارت در مسیر دانلود معمول گوشی ذخیره می‌شوند؛ می‌توانید آن‌ها را با برنامه مدیریت فایل به پوشه «کیو آر کد» منتقل کنید.'); return; }
+  try {
+    const parent = await window.showDirectoryPicker({mode:'readwrite',startIn:'downloads'});
+    qrDownloadDirectory = await parent.getDirectoryHandle('کیو آر کد', {create:true});
+    alert('✅ پوشه «کیو آر کد» در مسیر انتخابی آماده شد. دانلودهای QR این نشست در آن ذخیره می‌شوند.');
+  } catch(e) { if(e.name!=='AbortError') alert('انتخاب پوشه ممکن نشد؛ دانلود معمول همچنان در دسترس است.'); }
+}
+async function saveQrFile(url, name) {
+  const filename = AL.safeName(name) + '.png';
+  try {
+    const response = await fetch(url); if(!response.ok) throw new Error('fetch');
+    const blob = await response.blob();
+    if(qrDownloadDirectory) {
+      let targetName = filename;
+      try { await qrDownloadDirectory.getFileHandle(filename); if(!confirm('فایل '+filename+' وجود دارد. جایگزین شود؟')) targetName=AL.safeName(name)+'-'+Date.now()+'.png'; }
+      catch(e) { if(e.name!=='NotFoundError') throw e; }
+      const handle = await qrDownloadDirectory.getFileHandle(targetName,{create:true});
+      const writer = await handle.createWritable(); await writer.write(blob); await writer.close();
+      alert('✅ QR در پوشه انتخابی ذخیره شد.');
+    } else { AL.downloadBlob(blob,filename); }
+  } catch(e) { alert('ذخیره در پوشه انجام نشد؛ فایل با دانلود معمول دریافت می‌شود.'); qrDownloadDirectory=null; AL.downloadDataUrl(url,filename); }
+}
+function downloadQR(elementId) {
   const img = $(elementId);
   if (!img.src) { alert(T().noQR); return; }
-  if (img.src.startsWith('data:')) { AL.downloadDataUrl(img.src, 'ArteminLand-' + filename + '.png'); return; }
-  fetch(img.src).then(r => r.blob()).then(b => AL.downloadBlob(b, 'ArteminLand-' + filename + '.png')).catch(() => window.open(img.src, '_blank'));
+  const name = elementId === 'qr-main' && lastFormData ? lastFormData.name : AL.CREATOR_DATA.name;
+  saveQrFile(img.src,name);
 }
 
 function downloadCurrentData() {
@@ -1374,13 +1399,10 @@ function exportSaved(kind) {
 }
 
 function showQrModal(card) {
-  const url = AL.qrDataUrl(AL.cardUrl(card), 512);
+  const url = AL.namedQr(AL.cardUrl(card), card.name);
   $('qrModal-name').textContent = card.name;
   $('qrModal-img').src = url;
-  $('qrModal-download').onclick = () => {
-    if (url.startsWith('data:')) AL.downloadDataUrl(url, 'QR-' + AL.safeName(card.name) + '.png');
-    else window.open(url, '_blank');
-  };
+  $('qrModal-download').onclick = () => saveQrFile(url, card.name);
   $('qrModal').classList.add('active');
 }
 $('qrModal').addEventListener('click', e => { if (e.target === $('qrModal')) $('qrModal').classList.remove('active'); });
