@@ -323,6 +323,14 @@ button:disabled { background: #999; cursor: default; }
           <p id="photo-hint" data-i18n="photoHint"></p>
           <img id="photo-preview" class="image-preview" alt="Preview">
         </div>
+        <p>روش بدون Firebase Storage: عکس را انتخاب و دانلود کنید، سپس در پوشه photos مخزن عمومی خود بارگذاری کنید و لینک مستقیم آن را در کادر زیر بگذارید. انتخاب فایل به‌تنهایی عکس را برای دیگران ارسال نمی‌کند.</p>
+        <button type="button" onclick="downloadPreparedPhoto()">۱. دانلود عکس آماده برای مخزن</button>
+        <label for="photo-url">۲. لینک مستقیم و عمومی عکس (اختیاری)</label>
+        <input id="photo-url" type="url" dir="ltr" placeholder="https://graphicsima78-bit.github.io/artminland/photos/profile.jpg" oninput="previewOnlinePhoto()">
+        <p id="photo-url-status" role="status"></p>
+        <img id="online-photo-preview" alt="پیش‌نمایش عکس اینترنتی" hidden style="max-width:160px;border-radius:16px">
+        <p>عکس عمومی خواهد بود. بدون عکس هم می‌توانید کارت بسازید؛ انتخاب عکس محلی را در این حالت پاک کنید.</p>
+        <button type="button" onclick="clearCardPhoto()">پاک کردن عکس و لینک آن</button>
       </div>
 
       <div class="checkbox-group">
@@ -467,15 +475,6 @@ button:disabled { background: #999; cursor: default; }
     measurementId: "G-TD7QWNY8ME"
   };
 
-  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
-  window.uploadCardPhoto = async function(blob) {
-    const auth = getAuth();
-    if (!auth.currentUser) await signInAnonymously(auth);
-    const dest = ref(getStorage(), 'card-photos/' + auth.currentUser.uid + '/' + crypto.randomUUID() + '.jpg');
-    await uploadBytes(dest, blob, {contentType:'image/jpeg'});
-    return getDownloadURL(dest);
-  };
   let db = null;
   try { db = getFirestore(initializeApp(firebaseConfig)); } catch (e) { console.error("Firebase init error:", e); }
 
@@ -515,7 +514,7 @@ let lastFormData = null;
 let currentCoords = null;
 let photoBase64 = '';
 let uploadedPhotoUrl = '';
-let buildingCard = false;
+
 let cloudSaved = false;
 let deferredPrompt = null;
 const LS_KEY = 'artemin_cards_v1';
@@ -746,6 +745,27 @@ function addTeamContact() {
   row.querySelector('button').onclick = () => row.remove();
   $('team-contacts').appendChild(row);
 }
+function downloadPreparedPhoto() {
+  if (!photoBase64) { alert('ابتدا یک عکس انتخاب کنید.'); return; }
+  AL.downloadDataUrl(photoBase64, 'profile-' + Date.now() + '.jpg');
+}
+function previewOnlinePhoto() {
+  const img = $('online-photo-preview'); const status = $('photo-url-status');
+  img.hidden = true; status.textContent = '';
+  if (!$('photo-url').value.trim()) { img.removeAttribute('src'); return; }
+  try {
+    const u = new URL($('photo-url').value.trim()); if (u.protocol !== 'https:') throw new Error();
+    status.textContent = 'در حال بررسی عکس…';
+    img.onload = () => { img.hidden = false; status.textContent = '✅ عکس از لینک اینترنتی بارگذاری شد.'; };
+    img.onerror = () => { img.hidden = true; status.textContent = 'عکس باز نشد؛ لینک مستقیم و عمومی را بررسی کنید و منتظر انتشار GitHub Pages بمانید.'; };
+    img.referrerPolicy = 'no-referrer'; img.src = u.href;
+  } catch(e) { status.textContent = 'لینک مستقیم عکس باید با https:// شروع شود.'; }
+}
+function clearCardPhoto() {
+  photoBase64 = ''; uploadedPhotoUrl = ''; $('photo-input').value = ''; $('photo-url').value = '';
+  $('photo-preview').style.display = 'none'; $('photo-hint').style.display = 'block';
+  $('online-photo-preview').hidden = true; $('online-photo-preview').removeAttribute('src'); $('photo-url-status').textContent = '';
+}
 function handlePhotoUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -966,22 +986,15 @@ $('form').addEventListener('submit', async function (e) {
     return;
   }
 
-  if (buildingCard) return;
+  const photoLink = $('photo-url').value.trim();
+  uploadedPhotoUrl = '';
+  if (photoLink) {
+    try { const u = new URL(photoLink); if (u.protocol !== 'https:' || u.username || u.password) throw new Error(); uploadedPhotoUrl = u.href; }
+    catch(e) { alert('لینک مستقیم عکس باید با https:// شروع شود.'); return; }
+  }
   if (photoBase64 && !uploadedPhotoUrl) {
-    buildingCard = true;
-    const photoToUpload = photoBase64;
-    try {
-      showStatus('در حال آپلود عکس؛ کمی صبر کنید…', 'success');
-      if (!window.uploadCardPhoto) throw new Error('Firebase module unavailable');
-      const blob = await (await fetch(photoToUpload)).blob();
-      const url = await window.uploadCardPhoto(blob);
-      if (photoBase64 !== photoToUpload) { alert('عکس تغییر کرد؛ دوباره ساخت کارت را بزنید.'); return; }
-      uploadedPhotoUrl = url;
-    } catch(err) {
-      console.error(err);
-      alert('آپلود عکس انجام نشد. Storage، ورود ناشناس و قوانین Firebase را مطابق راهنما فعال کنید. برای ساخت کارت بدون عکس، فرم را پاک کنید و بدون عکس بسازید.');
-      return;
-    } finally { buildingCard = false; }
+    alert('عکس انتخابی فقط پیش‌نمایش است. ابتدا «دانلود عکس آماده» را بزنید، آن را در پوشه photos مخزن بارگذاری کنید و لینک اینترنتی عکس را وارد کنید.');
+    return;
   }
   const contacts = [...document.querySelectorAll('.team-row')].map(row => ({role:row.querySelector('.team-role').value.trim(),name:row.querySelector('.team-name').value.trim(),phone:AL.normDigits(row.querySelector('.team-phone').value)}));
   if (contacts.some(c => !c.role || !/^\+?\d{8,15}$/.test(c.phone))) { alert('سمت و شماره معتبر را برای هر مخاطب وارد کنید.'); return; }
@@ -995,7 +1008,7 @@ $('form').addEventListener('submit', async function (e) {
     type: currentType,
     registerGoogle: $('check-google').checked,
     registerNeshan: $('check-neshan').checked,
-    hasPhoto: !!photoBase64
+    hasPhoto: !!uploadedPhotoUrl
   };
   if (currentCoords) { card.lat = currentCoords.lat; card.lng = currentCoords.lng; }
   if (email) card.email = email;
@@ -1080,7 +1093,7 @@ function resetForm() {
   $('phones-container').innerHTML = '<div class="phone-row"><input type="tel" class="phone-input" inputmode="tel" placeholder="09153136173"></div>';
   $('photo-preview').style.display = 'none';
   $('photo-hint').style.display = 'block';
-  photoBase64 = ''; uploadedPhotoUrl = ''; $('team-contacts').innerHTML = '';
+  clearCardPhoto(); $('team-contacts').innerHTML = '';
   currentCoords = null;
   lastFormData = null;
   cloudSaved = false;
