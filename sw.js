@@ -1,5 +1,5 @@
 // Service Worker - نسخه ۴ با پشتیبانی کامل آفلاین از اسکنر و ساخت QR
-const CACHE_NAME = 'artminland-stable-update-v18';
+const CACHE_NAME = 'artminland-install-and-update-v19';
 const ASSETS = [
   './',
   './index.html',

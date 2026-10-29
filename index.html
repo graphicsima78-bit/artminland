@@ -152,6 +152,7 @@ button:disabled { background: #999; cursor: default; }
 
   <!-- ================= فرم ================= -->
   <div style="margin:10px 0;padding:12px;background:#f3f8f3;border-radius:10px">
+    <button type="button" id="manual-install-button" onclick="installApp()">📲 نصب برنامه روی این دستگاه</button>
     <button type="button" onclick="checkAppUpdate()">🔄 بررسی به‌روزرسانی — بدون نصب مجدد</button>
     <p id="pwaUpdateStatus" role="status" style="font-size:13px">اطلاعات ذخیره‌شده با به‌روزرسانی پاک نمی‌شود. برای به‌روزرسانی برنامه را حذف نکنید.</p>
     <div id="pwaUpdateNotice" hidden><button type="button" onclick="applyAppUpdate()">✅ فعال کردن نسخه جدید</button><button type="button" onclick="document.getElementById('pwaUpdateNotice').hidden=true">بعداً</button></div>
@@ -1619,16 +1620,24 @@ function applyAppUpdate(){
 }
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
-  let knownInstalled=false; try{knownInstalled=localStorage.getItem('artminland-installed')==='yes';}catch(err){}
-  if(isStandalone() || knownInstalled){hideInstallPrompt();return;}
+  if(isStandalone()){hideInstallPrompt();return;}
   deferredPrompt=e; $('installBanner').style.display='block';
 });
 window.addEventListener('appinstalled',()=>{try{localStorage.setItem('artminland-installed','yes');}catch(e){}hideInstallPrompt();});
 if(isStandalone()){try{localStorage.setItem('artminland-installed','yes');}catch(e){}hideInstallPrompt();}
 async function installApp(){
-  if(isStandalone()){hideInstallPrompt();return;}
-  if(!deferredPrompt)return;
-  const prompt=deferredPrompt;await prompt.prompt();await prompt.userChoice;hideInstallPrompt();
+  if(isStandalone()){
+    hideInstallPrompt();
+    alert('شما همین حالا داخل نسخه نصب‌شده هستید؛ نیازی به نصب دوباره نیست. برای نسخه جدید «بررسی به‌روزرسانی» را بزنید.');
+    return;
+  }
+  if(!deferredPrompt){
+    alert('اگر برنامه قبلاً نصب است، از آیکون آن در گوشی بازش کنید.\nبرای نصب روی دستگاه جدید: سایت را مستقیماً در Chrome باز کنید، منوی سه‌نقطه ⋮ را بزنید و «نصب برنامه / Install app» یا «افزودن به صفحه اصلی / Add to Home screen» را انتخاب کنید.\nنمایش پنجره نصب به مرورگر بستگی دارد.');
+    return;
+  }
+  const prompt=deferredPrompt;
+  try{await prompt.prompt();await prompt.userChoice;}catch(e){alert('پنجره نصب باز نشد؛ از منوی سه‌نقطه Chrome، نصب برنامه یا افزودن به صفحه اصلی را انتخاب کنید.');}
+  finally{hideInstallPrompt();}
 }
 
 setLang('fa');
