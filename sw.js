@@ -1,11 +1,13 @@
 // Service Worker - نسخه ۴ با پشتیبانی کامل آفلاین از اسکنر و ساخت QR
-const CACHE_NAME = 'artminland-phone-layout-v15';
+const CACHE_NAME = 'artminland-cloud-bank-v17';
 const ASSETS = [
   './',
   './index.html',
   './card.html',
   './manifest.json',
   './common.js',
+  './archive-backup.js',
+  './contact-import.js',
   './qrcode.min.js',
   './html5-qrcode.min.js',
   './admin.html',
