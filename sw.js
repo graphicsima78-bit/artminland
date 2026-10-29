@@ -1,5 +1,5 @@
 // Service Worker - نسخه ۴ با پشتیبانی کامل آفلاین از اسکنر و ساخت QR
-const CACHE_NAME = 'artemin-land-v5';
+const CACHE_NAME = 'artminland-auth-cloud-fix-v13';
 const ASSETS = [
   './',
   './index.html',

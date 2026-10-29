@@ -490,25 +490,38 @@ button:disabled { background: #999; cursor: default; }
     measurementId: "G-TD7QWNY8ME"
   };
 
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+  let authReady = Promise.resolve(null);
+  window.cloudSaveError = '';
   let db = null;
-  try { db = getFirestore(initializeApp(firebaseConfig)); } catch (e) { console.error("Firebase init error:", e); }
+  try {
+    const app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+    const auth = getAuth(app);
+    authReady = new Promise((resolve, reject) => {
+      const unsubscribe = onAuthStateChanged(auth, user => { unsubscribe(); resolve(user); }, reject);
+    });
+  } catch (e) { console.error("Firebase init error:", e); }
 
-  window.saveToFirestore = async function (data, retryCount = 0) {
-    if (!db) return false;
+  window.saveToFirestore = async function(data) {
+    window.cloudSaveError = '';
     try {
-      const {id, ...payload} = data;
-      await setDoc(doc(db, "customers", id), { ...payload, createdAt: new Date().toISOString() });
+      if (!db) throw new Error('راه‌اندازی Firebase انجام نشده است.');
+      const user = await authReady;
+      if (!user) throw new Error('در همین مرورگر ابتدا وارد پنل مدیریت شوید، سپس به این صفحه برگردید.');
+      if (user.uid !== 'T1PKHKYd0scdVovGfgHI4d4zhlE3') throw new Error('این حساب، مدیر مجاز فعلی نیست. با حساب مدیر وارد شوید.');
+      const {id,...payload} = data;
+      if (!id) throw new Error('شناسه کارت موجود نیست؛ کارت را ویرایش و در گوشی ذخیره کنید.');
+      await setDoc(doc(db,'customers',id), {...payload,createdAt:new Date().toISOString()});
       return true;
-    } catch (e) {
-      console.error("Error adding document:", e);
-      if (e.code === 'permission-denied') return false;
-      if (retryCount < 3) {
-        await new Promise(r => setTimeout(r, 1000));
-        return window.saveToFirestore(data, retryCount + 1);
-      }
-      return false;
+    } catch(e) {
+      const code = e.code || '';
+      const hint = code === 'permission-denied' ? 'Firebase اجازه ذخیره نداد؛ شناسه مدیر، انتشار قوانین و اندازه فیلدهای کارت را بررسی کنید.' : code === 'unavailable' ? 'سرویس Firebase در دسترس نیست؛ اتصال به خود Firebase را بررسی کنید.' : e.message;
+      window.cloudSaveError = (code ? code + ': ' : '') + hint;
+      console.error(e); return false;
     }
   };
+
 </script>
 
 <script>
@@ -697,13 +710,15 @@ function cloudPayload(c) {
   return out;
 }
 async function sendToCloud(card) {
-  if (typeof window.saveToFirestore !== 'function') return false;
+  window.cloudSaveError = '';
+  if (typeof window.saveToFirestore !== 'function') { window.cloudSaveError = 'ماژول Firebase بارگذاری نشده است؛ دسترسی به gstatic.com و نسخه صفحه را بررسی کنید.'; return false; }
+  if (!card.id) card.id = crypto.randomUUID();
   try {
     return await Promise.race([
       window.saveToFirestore(cloudPayload(card)),
       new Promise((_, rej) => setTimeout(() => rej(new Error('Timeout')), 10000))
     ]);
-  } catch (e) { console.warn(e); return false; }
+  } catch (e) { window.cloudSaveError = e.message === 'Timeout' ? 'پاسخ Firebase دیر رسید؛ نتیجه هنوز قطعی نیست. تلاش مجدد با همین کارت، همان شناسه را استفاده می‌کند.' : e.message; console.warn(e); return false; }
 }
 
 // ---------- زبان و تب ----------
@@ -1125,7 +1140,7 @@ $('form').addEventListener('submit', async function (e) {
   if (lastFormData === card) {
     cloudSaved = saved === true;
     refreshActionButtons();
-    showStatus(saved === true ? '✅ کارت در فضای ابری ذخیره شد. ذخیره در گوشی فقط با دکمه مربوط انجام می‌شود.' : '⚠️ ذخیره ابری تأیید نشد؛ اینترنت یا قوانین Firebase را بررسی کنید. برای حفظ کارت فعلاً ذخیره در گوشی را بزنید و سپس دوباره ذخیره ابری را امتحان کنید.', saved === true ? 'success' : 'error');
+    showStatus(saved === true ? '✅ کارت در فضای ابری ذخیره شد. ذخیره در گوشی فقط با دکمه مربوط انجام می‌شود.' : ('⚠️ ذخیره ابری تأیید نشد: ' + (window.cloudSaveError || 'خطای نامشخص') + ' — نسخه گوشی و بک‌آپ را نگه دارید.'), saved === true ? 'success' : 'error');
   }
 
 });
@@ -1159,7 +1174,7 @@ async function saveCloud() {
   $('btn-save-cloud').disabled = true;
   const ok = await sendToCloud(lastFormData);
   cloudSaved = !!ok;
-  showStatus(ok === 'partial' ? T().savedPartial : (ok ? T().savedCloud : T().saveCloudFailed), ok === true ? 'success' : 'error');
+  showStatus(ok === 'partial' ? T().savedPartial : (ok ? T().savedCloud : 'ذخیره ابری تأیید نشد: ' + (window.cloudSaveError || 'خطای نامشخص')), ok === true ? 'success' : 'error');
   refreshActionButtons();
   if (!ok) $('btn-save-cloud').disabled = false;
 }
@@ -1376,7 +1391,7 @@ function renderSaved() {
         const ok = await sendToCloud(c);
         cb.textContent = ok ? '✅' : T().btnToCloud;
         cb.disabled = ok;
-        if (!ok) alert(T().saveCloudFailed); else if (ok === 'partial') alert(T().savedPartial);
+        if (!ok) alert('ذخیره ابری تأیید نشد: ' + (window.cloudSaveError || 'خطای نامشخص')); else if (ok === 'partial') alert(T().savedPartial);
       });
       btn(t.btnDelete, 'btn-red', () => {
         if (!confirm(T().confirmDelete)) return;
