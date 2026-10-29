@@ -200,7 +200,7 @@
     const phones = Array.isArray(d.phones) ? d.phones : (d.phone ? [d.phone] : []);
     let v = 'BEGIN:VCARD\r\nVERSION:3.0\r\n';
     v += 'N:' + AL.vEsc(d.name) + ';;;;\r\n';
-    v += 'FN:' + AL.vEsc(d.name) + '\r\n';
+    v += 'FN:' + AL.vEsc(d.managerName || d.name) + '\r\n';
     if (d.type === 'business') v += 'ORG:' + AL.vEsc(d.name) + '\r\n';
     if (d.title) v += 'TITLE:' + AL.vEsc(d.title) + '\r\n';
     if (d.description) v += 'NOTE:' + AL.vEsc(d.description) + '\r\n';
@@ -412,7 +412,7 @@
   }).filter(link => /^(https?:\/\/|mailto:)/i.test(link.url));
   // Public, self-contained card links. No database read permissions required.
   AL.cardUrl = function (card) {
-    const fields = ['contacts','photoUrl','category','name','title','description','address','phones','type','instagram','telegram','whatsapp','eitaa','bale','rubika','email','website'];
+    const fields = ['managerName','contacts','photoUrl','category','name','title','description','address','phones','type','instagram','telegram','whatsapp','eitaa','bale','rubika','email','website'];
     const data = {};
     fields.forEach(k => { if (card[k]) data[k] = card[k]; });
     const bytes = new TextEncoder().encode(JSON.stringify(data));
@@ -428,7 +428,7 @@
     const out = {};
     out.contacts = Array.isArray(d.contacts) ? d.contacts.slice(0,10).filter(c=>c && typeof c.role==='string' && typeof c.phone==='string').map(c=>({role:c.role.slice(0,80),name:typeof c.name==='string'?c.name.slice(0,80):'',phone:AL.normDigits(c.phone)})) : [];
     if (typeof d.photoUrl === 'string') { try { const u = new URL(d.photoUrl); if(u.protocol === 'https:') out.photoUrl = u.href; } catch(e) {} }
-    ['category','name','title','description','address','type'].forEach(k => { if (typeof d[k] === 'string') out[k] = d[k].slice(0, 4000); });
+    ['managerName','category','name','title','description','address','type'].forEach(k => { if (typeof d[k] === 'string') out[k] = d[k].slice(0, 4000); });
     const normalizers = {instagram:AL.normInstagram, telegram:AL.normTelegram, whatsapp:AL.normWhatsapp, eitaa:AL.normEitaa, bale:AL.normBale, rubika:AL.normRubika, email:AL.normEmail, website:AL.normUrl};
     Object.keys(normalizers).forEach(k => { if (typeof d[k] === 'string') out[k] = normalizers[k](d[k]) || d[k]; });
     out.phones = Array.isArray(d.phones) ? d.phones.filter(v => typeof v === 'string').slice(0,20).map(AL.normDigits).filter(Boolean) : [];

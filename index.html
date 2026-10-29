@@ -158,11 +158,15 @@ button:disabled { background: #999; cursor: default; }
         <label class="required" for="name" data-i18n="labelName"></label>
         <input type="text" id="name" maxlength="120" autocomplete="off">
       </div>
+      <div class="form-group">
+        <label for="manager-name">نام مدیر / مسئول</label>
+        <input type="text" id="manager-name" maxlength="120" placeholder="مثلاً: علی احمدی">
+      </div>
 
       <div class="form-group">
         <label class="required" data-i18n="labelPhone"></label>
         <div id="phones-container">
-          <div class="phone-row"><input type="tel" class="phone-input" inputmode="tel" placeholder="09153136173"></div>
+          <div class="phone-row"><input type="tel" class="phone-input" inputmode="tel" placeholder="09153136173"><button type="button" onclick="pickPhoneContact(this)">👤 مخاطبین</button></div>
         </div>
         <button type="button" class="btn-orange btn-add-phone" onclick="addPhoneField()" data-i18n="btnAddPhone"></button>
       </div>
@@ -355,6 +359,8 @@ button:disabled { background: #999; cursor: default; }
 
       <button type="submit" id="btn-generate" data-i18n="btnGenerate"></button>
     </form>
+    <p><a href="./admin.html" target="_blank" rel="noopener">ورود مدیر برای ذخیره ابری</a></p>
+    <button type="button" onclick="if(window.checkCloudLogin)window.checkCloudLogin();else alert('ماژول ورود Firebase هنوز بارگذاری نشده است.')">بررسی حساب ورود ابری</button>
     <div id="status-msg" class="status-msg"></div>
 
     <div id="result">
@@ -492,22 +498,31 @@ button:disabled { background: #999; cursor: default; }
 
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
   let authReady = Promise.resolve(null);
+  let cardAuth = null;
   window.cloudSaveError = '';
   let db = null;
   try {
     const app = initializeApp(firebaseConfig);
     db = getFirestore(app);
-    const auth = getAuth(app);
+    const auth = getAuth(app); cardAuth = auth;
     authReady = new Promise((resolve, reject) => {
       const unsubscribe = onAuthStateChanged(auth, user => { unsubscribe(); resolve(user); }, reject);
     });
   } catch (e) { console.error("Firebase init error:", e); }
 
+  window.checkCloudLogin = async function() {
+    try {
+      await authReady; const user = cardAuth && cardAuth.currentUser;
+      if(!user) { alert('در این مرورگر وارد نشده‌اید. پنل مدیریت را باز کنید، وارد شوید و صفحه اصلی را دوباره بارگذاری کنید.'); return; }
+      alert('شناسه حساب فعلی:\n'+user.uid+'\n'+(user.uid==='T1PKHKYd0scdVovGfgHI4d4zhlE3' ? '✅ با شناسه مدیر قوانین یکسان است.' : '⚠️ با شناسه مدیر قوانین متفاوت است. حساب درست را بررسی کنید؛ قوانین را عمومی نکنید.'));
+    } catch(e) { alert('راه‌اندازی ورود Firebase ناموفق است: '+e.message); }
+  };
   window.saveToFirestore = async function(data) {
     window.cloudSaveError = '';
     try {
       if (!db) throw new Error('راه‌اندازی Firebase انجام نشده است.');
-      const user = await authReady;
+      await authReady;
+      const user = cardAuth.currentUser;
       if (!user) throw new Error('در همین مرورگر ابتدا وارد پنل مدیریت شوید، سپس به این صفحه برگردید.');
       if (user.uid !== 'T1PKHKYd0scdVovGfgHI4d4zhlE3') throw new Error('این حساب، مدیر مجاز فعلی نیست. با حساب مدیر وارد شوید.');
       const {id,...payload} = data;
@@ -704,7 +719,7 @@ async function copyText(text) {
 }
 
 function cloudPayload(c) {
-  const keys = ['id', 'name', 'phones', 'title', 'description', 'address', 'category', 'type', 'registerGoogle', 'registerNeshan', 'hasPhoto', 'contacts', 'photoUrl', 'lat', 'lng', 'email', 'website', 'instagram', 'whatsapp', 'telegram', 'eitaa', 'bale', 'rubika'];
+  const keys = ['id', 'managerName', 'name', 'phones', 'title', 'description', 'address', 'category', 'type', 'registerGoogle', 'registerNeshan', 'hasPhoto', 'contacts', 'photoUrl', 'lat', 'lng', 'email', 'website', 'instagram', 'whatsapp', 'telegram', 'eitaa', 'bale', 'rubika'];
   const out = {};
   keys.forEach(k => { if (c[k] !== undefined && c[k] !== null) out[k] = c[k]; });
   return out;
@@ -754,11 +769,34 @@ function setType(type) {
 }
 
 // ---------- شماره‌ها و عکس ----------
+async function pickPhoneContact(button) {
+  if (!navigator.contacts || !navigator.contacts.select) {
+    alert('انتخاب مخاطب در این مرورگر پشتیبانی نمی‌شود. در گوشی اندروید با Chrome امتحان کنید یا شماره را از مخاطبین کپی و اینجا وارد کنید.'); return;
+  }
+  try {
+    const contacts = await navigator.contacts.select(['name','tel'], {multiple:false});
+    const contact = contacts[0]; if(!contact) return;
+    const numbers = (contact.tel || []).filter(Boolean);
+    if(!numbers.length) { alert('مخاطب انتخابی شماره ندارد.'); return; }
+    let number = numbers[0];
+    if(numbers.length > 1) {
+      const choice = prompt('شماره مورد نظر را انتخاب کنید (عدد):\n'+numbers.map((n,i)=>(i+1)+': '+n).join('\n'),'1');
+      if(choice === null) return;
+      const index = Number(choice)-1;
+      if(!Number.isInteger(index) || index<0 || index>=numbers.length) { alert('انتخاب نامعتبر است.'); return; }
+      number = numbers[index];
+    }
+    button.closest('.phone-row').querySelector('.phone-input').value = AL.normDigits(number);
+    const name = (contact.name || [])[0];
+    if(name && !$('manager-name').value.trim()) $('manager-name').value = name;
+  } catch(e) { if(e.name !== 'AbortError') alert('انتخاب مخاطب انجام نشد؛ شماره را دستی وارد کنید.'); }
+}
 function addPhoneField(val = '') {
   const row = document.createElement('div');
   row.className = 'phone-row';
   row.innerHTML = `<input type="tel" class="phone-input" inputmode="tel" placeholder="09153136173" value="${esc(val)}"><button type="button" class="btn-remove-phone">❌</button>`;
   row.querySelector('button').addEventListener('click', () => row.remove());
+  const picker = document.createElement('button'); picker.type = 'button'; picker.textContent = '👤 مخاطبین'; picker.onclick = () => pickPhoneContact(picker); row.appendChild(picker);
   $('phones-container').appendChild(row);
 }
 function addTeamContact() {
@@ -1056,7 +1094,7 @@ $('form').addEventListener('submit', async function (e) {
   const card = {
     id: editingCardId || crypto.randomUUID(),
     contacts, photoUrl: uploadedPhotoUrl,
-    name, phones,
+    name, phones, managerName: $('manager-name').value.trim(),
     title: $('title-field').value.trim(),
     description: $('description').value.trim(),
     address: $('address').value.trim(),
@@ -1076,6 +1114,21 @@ $('form').addEventListener('submit', async function (e) {
   if (rubika) card.rubika = rubika;
   if (whatsapp) card.whatsapp = whatsapp;
 
+  const comparable = value => AL.normWhatsapp(value) || AL.normDigits(value);
+  const incomingPhones = new Set(card.phones.map(comparable));
+  const matches = loadLocal().filter(old => old.id !== card.id && (old.phones || []).some(phone => incomingPhones.has(comparable(phone))));
+  if (matches.length > 1) { alert('این شماره در چند کارت بایگانی شده است. برای جلوگیری از تغییر اشتباه، از فهرست ذخیره‌شده کارت صحیح را انتخاب و ویرایش کنید.'); return; }
+  if (matches.length === 1) {
+    const old = matches[0];
+    if(!confirm('این شماره قبلاً برای «'+old.name+'» ذخیره شده است. همین کارت به‌روزرسانی شود؟ برای بررسی یا ساخت کارت مستقل، انصراف بزنید.')) return;
+    if(old.name !== card.name) {
+      const answer = prompt('نام بایگانی را انتخاب کنید:\n۱: '+old.name+'\n۲: '+card.name,'1');
+      if(answer !== '1' && answer !== '2') return;
+      if(answer === '1') { card.name = old.name; $('name').value = old.name; }
+    }
+    card.id = old.id || card.id;
+    if(!old.id) { const list=loadLocal(); const i=list.findIndex(c=>localCardKey(c)===localCardKey(old)); if(i>=0){list[i].id=card.id;if(!storeLocal(list)){alert('ثبت شناسه کارت در گوشی ممکن نشد.');return;}} }
+  }
   editingCardId = card.id;
   lastFormData = card;
   cloudSaved = false;
@@ -1089,6 +1142,7 @@ $('form').addEventListener('submit', async function (e) {
   $('qr-creator').src = AL.namedQr(AL.CREATOR_VCARD, AL.CREATOR_DATA.name);
 
   let info = `<p><strong>${t.name}:</strong> ${esc(name)}</p>`;
+  if(card.managerName) info += `<p><strong>مدیر / مسئول:</strong> ${esc(card.managerName)}</p>`;
   info += `<p><strong>${t.type}:</strong> ${card.type === 'business' ? t.business : t.personal}</p>`;
   info += `<p><strong>${t.phone}:</strong> <span dir="ltr">${esc(phones.join(' - '))}</span></p>`;
   if (card.category) info += `<p><strong>${t.category}:</strong> ${esc(catLabel(card.category))}</p>`;
@@ -1155,7 +1209,7 @@ function refreshActionButtons() {
 
 function resetForm() {
   $('form').reset();
-  $('phones-container').innerHTML = '<div class="phone-row"><input type="tel" class="phone-input" inputmode="tel" placeholder="09153136173"></div>';
+  $('phones-container').innerHTML = '<div class="phone-row"><input type="tel" class="phone-input" inputmode="tel" placeholder="09153136173"><button type="button" onclick="pickPhoneContact(this)">👤 مخاطبین</button></div>';
   $('photo-preview').style.display = 'none';
   $('photo-hint').style.display = 'block';
   clearCardPhoto(); editingCardId = null; $('team-contacts').innerHTML = '';
@@ -1302,7 +1356,7 @@ function editSavedCard(card) {
   }
   editingCardId = card.id;
   setType(card.type || 'business');
-  const fields = {name:'name',title:'title-field',description:'description',address:'address',email:'email',website:'website',instagram:'instagram',telegram:'telegram',whatsapp:'whatsapp',eitaa:'eitaa',bale:'bale',rubika:'rubika'};
+  const fields = {managerName:'manager-name',name:'name',title:'title-field',description:'description',address:'address',email:'email',website:'website',instagram:'instagram',telegram:'telegram',whatsapp:'whatsapp',eitaa:'eitaa',bale:'bale',rubika:'rubika'};
   Object.entries(fields).forEach(([key,id]) => { $(id).value = card[key] || ''; });
   $('phones-container').innerHTML = '';
   const phones = Array.isArray(card.phones) && card.phones.length ? card.phones : [card.phone || ''];
@@ -1365,6 +1419,7 @@ function renderSaved() {
       item.appendChild(mk('h4', '', c.name));
       const ph = mk('p', 'ltr', (c.phones || []).join(' - '));
       item.appendChild(ph);
+      if (c.managerName) item.appendChild(mk('p', '', 'مدیر: ' + c.managerName));
       if (c.title) item.appendChild(mk('p', '', c.title));
       if (c.address) item.appendChild(mk('p', '', c.address));
       if (c.email) item.appendChild(mk('p', 'ltr', c.email));
