@@ -1,5 +1,5 @@
 // Service Worker - نسخه ۴ با پشتیبانی کامل آفلاین از اسکنر و ساخت QR
-const CACHE_NAME = 'artminland-manager-contact-v14';
+const CACHE_NAME = 'artminland-phone-layout-v15';
 const ASSETS = [
   './',
   './index.html',

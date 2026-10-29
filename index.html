@@ -50,7 +50,13 @@ button:disabled { background: #999; cursor: default; }
 .btn-add-phone { padding: 10px; font-size: 14px; }
 .btn-remove-phone { padding: 8px 12px; font-size: 12px; width: auto; margin: 0; flex-shrink: 0; background: #f44336; }
 .phone-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
-.phone-row input { flex: 1; direction: ltr; text-align: start; }
+.phone-row { width:100%; min-width:0; }
+.phone-row input.phone-input { flex:1 1 0%; width:0; min-width:0; height:48px; direction:ltr; text-align:left; padding:10px 12px; font-size:16px; }
+.phone-row button { flex:0 0 auto; width:auto; max-width:none; margin:0; padding:8px; height:44px; font-size:12px; white-space:nowrap; }
+.phone-row .contact-picker { width:44px; padding:0; font-size:21px; display:inline-flex; align-items:center; justify-content:center; }
+.phone-row .btn-remove-phone { width:34px; padding:0; }
+.phone-row:focus-within input { border-color:#2e7d32; }
+
 .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; }
 .actions button { margin: 0; }
 .actions .full { grid-column: 1 / -1; }
@@ -165,8 +171,9 @@ button:disabled { background: #999; cursor: default; }
 
       <div class="form-group">
         <label class="required" data-i18n="labelPhone"></label>
+        <p class="hint">شماره را مستقیم تایپ یا جای‌گذاری کنید؛ دکمه 👤 فقط برای انتخاب اختیاری از مخاطبین است.</p>
         <div id="phones-container">
-          <div class="phone-row"><input type="tel" class="phone-input" inputmode="tel" placeholder="09153136173"><button type="button" onclick="pickPhoneContact(this)">👤 مخاطبین</button></div>
+          <div class="phone-row"><input type="tel" class="phone-input" inputmode="tel" autocomplete="tel" aria-label="شماره تماس؛ قابل تایپ دستی" placeholder="09153136173"><button type="button" class="contact-picker" title="انتخاب از مخاطبین" aria-label="انتخاب از مخاطبین" onclick="pickPhoneContact(this)">👤</button></div>
         </div>
         <button type="button" class="btn-orange btn-add-phone" onclick="addPhoneField()" data-i18n="btnAddPhone"></button>
       </div>
@@ -794,9 +801,9 @@ async function pickPhoneContact(button) {
 function addPhoneField(val = '') {
   const row = document.createElement('div');
   row.className = 'phone-row';
-  row.innerHTML = `<input type="tel" class="phone-input" inputmode="tel" placeholder="09153136173" value="${esc(val)}"><button type="button" class="btn-remove-phone">❌</button>`;
+  row.innerHTML = `<input type="tel" class="phone-input" inputmode="tel" autocomplete="tel" aria-label="شماره تماس؛ قابل تایپ دستی" placeholder="09153136173" value="${esc(val)}"><button type="button" class="btn-remove-phone">❌</button>`;
   row.querySelector('button').addEventListener('click', () => row.remove());
-  const picker = document.createElement('button'); picker.type = 'button'; picker.textContent = '👤 مخاطبین'; picker.onclick = () => pickPhoneContact(picker); row.appendChild(picker);
+  const picker = document.createElement('button'); picker.type = 'button'; picker.textContent = '👤'; picker.className = 'contact-picker'; picker.title = 'انتخاب از مخاطبین'; picker.setAttribute('aria-label','انتخاب از مخاطبین'); picker.onclick = () => pickPhoneContact(picker); row.appendChild(picker);
   $('phones-container').appendChild(row);
 }
 function addTeamContact() {
@@ -1209,7 +1216,7 @@ function refreshActionButtons() {
 
 function resetForm() {
   $('form').reset();
-  $('phones-container').innerHTML = '<div class="phone-row"><input type="tel" class="phone-input" inputmode="tel" placeholder="09153136173"><button type="button" onclick="pickPhoneContact(this)">👤 مخاطبین</button></div>';
+  $('phones-container').innerHTML = '<div class="phone-row"><input type="tel" class="phone-input" inputmode="tel" autocomplete="tel" aria-label="شماره تماس؛ قابل تایپ دستی" placeholder="09153136173"><button type="button" class="contact-picker" title="انتخاب از مخاطبین" aria-label="انتخاب از مخاطبین" onclick="pickPhoneContact(this)">👤</button></div>';
   $('photo-preview').style.display = 'none';
   $('photo-hint').style.display = 'block';
   clearCardPhoto(); editingCardId = null; $('team-contacts').innerHTML = '';
