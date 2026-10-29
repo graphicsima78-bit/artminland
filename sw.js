@@ -1,5 +1,5 @@
 // Service Worker - نسخه ۴ با پشتیبانی کامل آفلاین از اسکنر و ساخت QR
-const CACHE_NAME = 'artminland-cloud-bank-v17';
+const CACHE_NAME = 'artminland-stable-update-v18';
 const ASSETS = [
   './',
   './index.html',
@@ -19,13 +19,15 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
   );
-  self.skipWaiting();
+  // Existing clients activate the update only after explicit confirmation.
 });
+
+self.addEventListener('message', event => { if(event.data && event.data.type === 'ACTIVATE_UPDATE') self.skipWaiting(); });
 
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))))
+      .then(keys => Promise.all(keys.filter(k => k.startsWith('artminland-') && k !== CACHE_NAME).map(k => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });

@@ -151,6 +151,11 @@ button:disabled { background: #999; cursor: default; }
   </div>
 
   <!-- ================= فرم ================= -->
+  <div style="margin:10px 0;padding:12px;background:#f3f8f3;border-radius:10px">
+    <button type="button" onclick="checkAppUpdate()">🔄 بررسی به‌روزرسانی — بدون نصب مجدد</button>
+    <p id="pwaUpdateStatus" role="status" style="font-size:13px">اطلاعات ذخیره‌شده با به‌روزرسانی پاک نمی‌شود. برای به‌روزرسانی برنامه را حذف نکنید.</p>
+    <div id="pwaUpdateNotice" hidden><button type="button" onclick="applyAppUpdate()">✅ فعال کردن نسخه جدید</button><button type="button" onclick="document.getElementById('pwaUpdateNotice').hidden=true">بعداً</button></div>
+  </div>
   <div class="tab-content active" id="content-form">
     <form id="form" novalidate>
       <div class="form-group">
@@ -1577,19 +1582,53 @@ async function openNeshan() {
   closeModal();
 }
 
-// ---------- PWA ----------
+// ---------- Stable installation and explicit updates ----------
+let appRegistration = null;
+let updateAccepted = false;
+const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+function hideInstallPrompt(){ $('installBanner').style.display='none'; deferredPrompt=null; }
+function offerUpdate(){ $('pwaUpdateNotice').hidden=false; $('pwaUpdateStatus').textContent='نسخه جدید آماده است. ابتدا کارت یا فرم نیمه‌کاره را ذخیره کنید.'; }
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(err => console.log('SW failed:', err)));
+  navigator.serviceWorker.addEventListener('controllerchange', () => { if(updateAccepted) location.reload(); });
+  window.addEventListener('load', async () => {
+    try {
+      appRegistration=await navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'});
+      if(appRegistration.waiting)offerUpdate();
+      appRegistration.addEventListener('updatefound',()=>{
+        const worker=appRegistration.installing;
+        if(worker)worker.addEventListener('statechange',()=>{ if(worker.state==='installed' && navigator.serviceWorker.controller)offerUpdate(); });
+      });
+      appRegistration.update().catch(()=>{});
+    } catch(e){ $('pwaUpdateStatus').textContent='بررسی نسخه انجام نشد؛ اتصال اینترنت را بررسی کنید.'; }
+  });
+}
+async function checkAppUpdate(){
+  $('pwaUpdateStatus').textContent='در حال بررسی نسخه…';
+  try{
+    if(!appRegistration) throw new Error();
+    await appRegistration.update();
+    if(appRegistration.waiting)offerUpdate();
+    else if(appRegistration.installing)$('pwaUpdateStatus').textContent='نسخه در حال دریافت است؛ کمی صبر کنید.';
+    else $('pwaUpdateStatus').textContent='بررسی انجام شد؛ فعلاً نسخه جدیدی آماده فعال‌سازی نیست. نیازی به نصب دوباره ندارید.';
+  }catch(e){$('pwaUpdateStatus').textContent='بررسی ممکن نشد؛ برنامه را حذف نکنید. بعداً دوباره امتحان کنید.';}
+}
+function applyAppUpdate(){
+  if(!confirm('کارت یا اطلاعات فرم را ذخیره کرده‌اید؟ برای فعال شدن نسخه جدید، صفحه دوباره باز می‌شود.'))return;
+  if(appRegistration&&appRegistration.waiting){updateAccepted=true;appRegistration.waiting.postMessage({type:'ACTIVATE_UPDATE'});}
+  else {$('pwaUpdateNotice').hidden=true;checkAppUpdate();}
 }
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
-  deferredPrompt = e;
-  $('installBanner').style.display = 'block';
+  let knownInstalled=false; try{knownInstalled=localStorage.getItem('artminland-installed')==='yes';}catch(err){}
+  if(isStandalone() || knownInstalled){hideInstallPrompt();return;}
+  deferredPrompt=e; $('installBanner').style.display='block';
 });
-function installApp() {
-  if (!deferredPrompt) return;
-  deferredPrompt.prompt();
-  deferredPrompt.userChoice.then(() => { deferredPrompt = null; $('installBanner').style.display = 'none'; });
+window.addEventListener('appinstalled',()=>{try{localStorage.setItem('artminland-installed','yes');}catch(e){}hideInstallPrompt();});
+if(isStandalone()){try{localStorage.setItem('artminland-installed','yes');}catch(e){}hideInstallPrompt();}
+async function installApp(){
+  if(isStandalone()){hideInstallPrompt();return;}
+  if(!deferredPrompt)return;
+  const prompt=deferredPrompt;await prompt.prompt();await prompt.userChoice;hideInstallPrompt();
 }
 
 setLang('fa');
