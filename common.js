@@ -199,7 +199,7 @@
   AL.buildVCard = function (d) {
     const phones = Array.isArray(d.phones) ? d.phones : (d.phone ? [d.phone] : []);
     let v = 'BEGIN:VCARD\r\nVERSION:3.0\r\n';
-    v += 'N:' + AL.vEsc(d.name) + ';;;;\r\n';
+    v += 'N:' + AL.vEsc(d.managerName || d.name) + ';;;;\r\n';
     v += 'FN:' + AL.vEsc(d.managerName || d.name) + '\r\n';
     if (d.type === 'business') v += 'ORG:' + AL.vEsc(d.name) + '\r\n';
     if (d.title) v += 'TITLE:' + AL.vEsc(d.title) + '\r\n';
@@ -305,6 +305,22 @@
     return 'https://api.qrserver.com/v1/create-qr-code/?size=500x500&margin=10&charset-source=UTF-8&data=' + encodeURIComponent(text);
   };
 
+  // Compact vCard QR: the scanner receives contact data, not a web-page URL.
+  AL.contactQrText = function(d) {
+    const name = d.managerName || d.name || '';
+    const lines = ['BEGIN:VCARD','VERSION:3.0','N:'+AL.vEsc(name)+';;;;','FN:'+AL.vEsc(name)];
+    if(d.type === 'business' && d.name) lines.push('ORG:'+AL.vEsc(d.name));
+    if(d.title) lines.push('TITLE:'+AL.vEsc(d.title));
+    const phones = Array.isArray(d.phones) ? d.phones : (d.phone ? [d.phone] : []);
+    phones.forEach((phone,i)=>lines.push('TEL;TYPE='+(i===0?'CELL':'WORK')+':'+AL.normDigits(phone)));
+    if(d.email) lines.push('EMAIL;TYPE=INTERNET:'+AL.vEsc(d.email));
+    if(d.address) lines.push('ADR;TYPE=WORK:;;'+AL.vEsc(d.address)+';;;;');
+    if(d.description) lines.push('NOTE:'+AL.vEsc(d.description));
+    AL.socialLinks(d).filter(link=>link.key!=='email').forEach(link=>lines.push('URL:'+AL.vEsc(link.url)));
+    lines.push('END:VCARD');
+    return lines.join('\r\n')+'\r\n';
+  };
+
   AL.namedQr = function(text, name) {
     const qr = AL.qrCanvas(text, 512);
     if (!qr) throw new Error('QR library unavailable');
@@ -315,7 +331,7 @@
     const label = String(name || 'کارت').slice(0,120);
     let size = 32; do { ctx.font = 'bold '+size+'px Tahoma, Arial'; if(ctx.measureText(label).width <= 540) break; size--; } while(size > 14);
     ctx.fillText(label,300,605,540);
-    ctx.font = '16px Tahoma, Arial'; ctx.fillStyle = '#555'; ctx.fillText('اسکن کنید و کارت را باز کنید',300,655);
+    ctx.font = '16px Tahoma, Arial'; ctx.fillStyle = '#555'; ctx.fillText('اسکن کنید و مخاطب را ذخیره کنید',300,655);
     return cv.toDataURL('image/png');
   };
   // ---------- دانلود ----------

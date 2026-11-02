@@ -62,6 +62,9 @@ td.actions button { margin: 2px; }
     <button class="btn" type="submit">ورود</button>
     <a class="btn btn-gray" href="index.html" style="text-align:center;">🔙 بازگشت به سایت</a>
     <button class="btn btn-gray" type="button" id="loginSignOut">خروج از حساب فعلی</button>
+    <button class="btn btn-blue" type="button" id="btnResetPassword">🔑 بازیابی رمز عبور مدیریت</button>
+    <p style="font-size:13px">ایمیل مدیر را در کادر بالا وارد کنید و بازیابی رمز را بزنید. پوشه Spam را هم بررسی کنید.</p>
+    <div id="resetStatus" class="msg" role="status" aria-live="polite"></div>
     <div id="loginError" class="msg err"></div>
   </form>
 
@@ -77,6 +80,7 @@ td.actions button { margin: 2px; }
       <input type="file" id="importBackup" accept=".json,application/json" hidden>
       <button class="btn" id="btnReload">🔄 بارگذاری مجدد</button>
       <a class="btn btn-gray" href="index.html">🔙 سایت</a>
+      <button class="btn btn-gray" id="btnAccountReset" type="button">🔑 تغییر رمز حساب فعلی</button>
       <button class="btn btn-gray" id="btnLogout">خروج</button>
     </div>
     <p>این بانک در Firebase است، نه Google Drive. فقط کارت‌های تأییدشده توسط سرور قابل مشاهده در دستگاه دیگرند. بک‌آپ شامل اطلاعات مشتریان است؛ فقط در محل امن نگه دارید.</p>
@@ -148,7 +152,7 @@ td.actions button { margin: 2px; }
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
   import { getFirestore, collection, getDocs, onSnapshot, setDoc, deleteDoc, updateDoc, doc, orderBy, query } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBUNhCBLHR10Q5J7lrigRpL4CuPk-y6toY",
@@ -268,7 +272,7 @@ td.actions button { margin: 2px; }
 
   function showQr(d) {
     $('qrName').textContent = d.name;
-    const url = AL.namedQr(AL.cardUrl(d), d.name);
+    const url = AL.namedQr(AL.contactQrText(d), d.name);
     $('qrImg').src = url;
     $('qrDownload').onclick = () => {
       if (url.startsWith('data:')) AL.downloadDataUrl(url, 'QR-' + AL.safeName(d.name) + '.png');
@@ -430,6 +434,35 @@ td.actions button { margin: 2px; }
       $('loginError').textContent = 'ورود ناموفق: ایمیل یا رمز عبور اشتباه است.';
     }
   });
+  let resetBusy=false;
+  async function requestReset(email, status, button){
+    email=String(email||'').trim();
+    if(!email){status.textContent='ابتدا ایمیل حساب مدیر را وارد کنید.';$('email').focus();return;}
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){status.textContent='قالب ایمیل درست نیست؛ آن را بررسی کنید.';return;}
+    if(resetBusy)return;
+    if(!confirm('درخواست لینک بازیابی رمز برای این ایمیل ارسال شود؟\n'+email))return;
+    resetBusy=true;button.disabled=true;status.textContent='در حال ثبت درخواست بازیابی…';
+    try{
+      await sendPasswordResetEmail(auth,email);
+      status.textContent='درخواست ثبت شد. اگر این ایمیل حساب واجد شرایط بازیابی داشته باشد، پیام بازنشانی را دریافت می‌کند. Inbox و Spam را بررسی کنید؛ از لینک داخل پیام استفاده کنید.';
+    }catch(e){
+      const messages={
+        'auth/too-many-requests':'درخواست‌های زیادی ارسال شده است؛ کمی صبر کنید و دوباره امتحان کنید.',
+        'auth/network-request-failed':'اتصال به سرویس Firebase برقرار نشد؛ شبکه را بررسی کنید و دوباره امتحان کنید.',
+        'auth/invalid-email':'قالب ایمیل معتبر نیست.',
+        'auth/operation-not-allowed':'بازیابی ایمیل/رمز در Firebase فعال نیست؛ تنظیمات Authentication باید بررسی شود.'
+      };
+      if(e.code==='auth/user-not-found')status.textContent='درخواست بررسی شد. اگر این ایمیل حساب واجد شرایط بازیابی داشته باشد، پیام دریافت می‌کند. Inbox و Spam را بررسی کنید.';
+      else status.textContent=messages[e.code]||('درخواست ارسال نشد: '+(e.code||'خطای نامشخص'));
+    }finally{resetBusy=false;button.disabled=false;}
+  }
+  $('btnResetPassword').onclick=()=>requestReset($('email').value,$('resetStatus'),$('btnResetPassword'));
+  $('btnAccountReset').onclick=()=>{
+    if(!auth.currentUser||!auth.currentUser.email){alert('حساب دارای ایمیل وارد نشده است.');return;}
+    requestReset(auth.currentUser.email,$('syncState'),$('btnAccountReset'));
+  };
+
+
   $('loginSignOut').addEventListener('click',()=>signOut(auth));
   $('btnLogout').addEventListener('click', () => signOut(auth));
 

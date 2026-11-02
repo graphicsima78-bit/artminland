@@ -1,5 +1,5 @@
 // Service Worker - نسخه ۴ با پشتیبانی کامل آفلاین از اسکنر و ساخت QR
-const CACHE_NAME = 'artminland-install-and-update-v19';
+const CACHE_NAME = 'artminland-contact-qr-reset-v21';
 const ASSETS = [
   './',
   './index.html',
